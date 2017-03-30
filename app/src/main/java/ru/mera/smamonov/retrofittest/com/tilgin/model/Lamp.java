@@ -9,7 +9,7 @@ public class Lamp {
     private String name;
     @SerializedName("uuid")
     @Expose
-    private Integer uuid;
+    private String uuid;
     @SerializedName("switched")
     @Expose
     private Boolean switched;
@@ -22,11 +22,11 @@ public class Lamp {
         this.name = name;
     }
 
-    public Integer getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(Integer uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
@@ -37,5 +37,4 @@ public class Lamp {
     public void setSwitched(Boolean switched) {
         this.switched = switched;
     }
-
 }
