@@ -1,4 +1,4 @@
-package ru.mera.smamonov.retrofittest.HgInterface;
+package ru.mera.smamonov.retrofittest.controller;
 
 import java.util.List;
 
@@ -15,8 +15,8 @@ import ru.mera.smamonov.retrofittest.com.tilgin.model.Lamp;
  * Created by sergeym on 29.03.2017.
  */
 
-public interface HgInterface {
-    @GET("lamps/")
+public interface LampInterface {
+    @GET("lamps")
     Call<List<Lamp>> getLamps();
 
     @GET("lamps/{device_id}")
