@@ -18,23 +18,23 @@ import ru.mera.smamonov.retrofittest.com.tilgin.model.Lamp;
 
 public class LampController {
 
-    public interface FailureListener {
-        public void OnFailure(Throwable t);
+    interface FailureListener {
+        void OnFailure(Throwable t);
     }
 
-    public interface GetLampsListener extends FailureListener {
-        public void OnSuccess(List<Lamp> lamps, String error);
+    interface GetLampsListener extends FailureListener {
+        void OnSuccess(List<Lamp> lamps, String error);
     }
 
-    public interface UpdateListener extends FailureListener {
-        public void OnSuccess(Lamp lamp, String error);
+    interface UpdateListener extends FailureListener {
+        void OnSuccess(Lamp lamp, String error);
     }
 
-    public interface GetLampListener extends FailureListener {
-        public void OnSuccess(Lamp lamp, String error);
+    interface GetLampListener extends FailureListener {
+        void OnSuccess(Lamp lamp, String error);
     }
 
-    LampInterface m_gitHubService = null;
+    private LampInterface m_gitHubService = null;
 
     public LampController()
     {
@@ -116,9 +116,9 @@ public class LampController {
         });
     }
 
-    public void revertLamp(final Lamp lamp, final UpdateListener updateListener) {
+    public void setLamp(final Lamp lamp, final UpdateListener updateListener) {
 
-        Call<ApiResponse> response = m_gitHubService.setLamp(lamp.getUuid(), !lamp.getSwitched());
+        Call<ApiResponse> response = m_gitHubService.setLamp(lamp.getUuid(), lamp.getSwitched());
 
         response.enqueue(new Callback<ApiResponse>() {
             final UpdateListener listener = updateListener;

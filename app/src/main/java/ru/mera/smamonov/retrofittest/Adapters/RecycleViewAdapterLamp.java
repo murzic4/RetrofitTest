@@ -11,67 +11,89 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ru.mera.smamonov.retrofittest.Activities.MainActivity;
 import ru.mera.smamonov.retrofittest.R;
 import ru.mera.smamonov.retrofittest.com.tilgin.model.Lamp;
-import ru.mera.smamonov.retrofittest.controller.LampController;
 
 
-public class RecycleViewAdapterLamp extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-{
+public class RecycleViewAdapterLamp extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Lamp> m_lamps = null;
-    private LampController lampController = null;
+    //    private LampController m_lampController = null;
+    private MainActivity m_parent_activity = null;
 
-    public class LampViewHolder extends RecyclerView.ViewHolder
-                                       implements View.OnClickListener
-    {
+    public class LampViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        CardView m_card_view;
-        TextView m_lamp_name;
-        TextView m_lamp_uuid;
-        ImageView m_lamp_picture;
-
+        CardView m_card_view = null;
+        TextView m_lamp_name = null;
+        TextView m_lamp_uuid = null;
+        ImageView m_lamp_picture = null;
         Lamp m_lamp = null;
 
         LampViewHolder(View itemView) {
             super(itemView);
-            itemView.setOnClickListener(this);
-            m_card_view = (CardView)itemView.findViewById(R.id.lamp_card_view);
-            m_lamp_name = (TextView)itemView.findViewById(R.id.lamp_name);
-            m_lamp_uuid = (TextView)itemView.findViewById(R.id.lamp_uuid);
-            m_lamp_picture = (ImageView)itemView.findViewById(R.id.lamp_picture);
+            m_card_view = (CardView) itemView.findViewById(R.id.lamp_card_view);
+            m_lamp_name = (TextView) itemView.findViewById(R.id.lamp_name);
+            m_lamp_uuid = (TextView) itemView.findViewById(R.id.lamp_uuid);
+            m_lamp_picture = (ImageView) itemView.findViewById(R.id.lamp_picture);
         }
 
-        public void onClick(View v)
-        {
-            Log.d("=================", "+================================onClick");
-            lampController.revertLamp(m_lamp,
-                    new LampController.UpdateListener() {
-                        @Override
-                        public void OnSuccess(Lamp lamp, String error) {
-                            Log.d("MainActivity", "Updating result:" + error);
-                        }
+        void RevertLamp() {
+            m_lamp.setSwitched(!m_lamp.getSwitched());
+            setActualPicture();
+        }
 
-                        @Override
-                        public void OnFailure(Throwable t) {
-                            Log.e("MainActivity", "Updating failure:" + t.getMessage());
-                        }
-                    });
+        void setActualPicture() {
+            if (m_lamp.getSwitched()) {
+                m_lamp_picture.setImageResource(R.drawable.ic_lamp_on);
+            } else {
+                m_lamp_picture.setImageResource(R.drawable.ic_lamp_off);
+            }
 
         }
     }
 
-    public RecycleViewAdapterLamp(List<Lamp> lamps, final LampController lampController)  {
+    public RecycleViewAdapterLamp(List<Lamp> lamps, final MainActivity parent_activity) {
         this.m_lamps = lamps;
-        this.lampController = lampController;
+        this.m_parent_activity = parent_activity;
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position)
-    {
-        LampViewHolder lampViewHolder = (LampViewHolder)viewHolder;
-        lampViewHolder.m_lamp = m_lamps.get(position);
-        lampViewHolder.m_lamp_name.setText(m_lamps.get(position).getName());
-        lampViewHolder.m_lamp_uuid.setText(m_lamps.get(position).getUuid());
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        final LampViewHolder lampViewHolder = (LampViewHolder) viewHolder;
+        final Lamp lamp = m_lamps.get(position);
+
+        lampViewHolder.m_lamp = lamp;
+        lampViewHolder.m_lamp_name.setText(lamp.getName());
+        lampViewHolder.m_lamp_uuid.setText(lamp.getUuid());
+        lampViewHolder.setActualPicture();
+
+        lampViewHolder.
+                itemView.
+                setOnClickListener(new View.OnClickListener() {
+                                       final Lamp m_lamp = lamp;
+                                       final LampViewHolder m_lampViewHolder = lampViewHolder;
+
+                                       @Override
+                                       public void onClick(View v) {
+                                           //Lamp lamp_to_be_updated = lamp;
+                                           Log.d("===>", "lamp state is " + lampViewHolder.m_lamp.getSwitched());
+                                           lampViewHolder.m_lamp.setSwitched(!lampViewHolder.m_lamp.getSwitched());
+                                           Log.d("===>", "lamp state change_to " + lampViewHolder.m_lamp.getSwitched());
+                                           //lamp.setSwitched(!lamp.getSwitched());
+                                           m_parent_activity.updateLamp(lampViewHolder.m_lamp, new MainActivity.UpdateDeviceListener() {
+                                               @Override
+                                               public void onSuccess() {
+                                                   lampViewHolder.setActualPicture();
+                                               }
+
+                                               @Override
+                                               public void onFailure() {
+                                               }
+                                           });
+                                       }
+
+                                   }
+                );
     }
 
     @Override
