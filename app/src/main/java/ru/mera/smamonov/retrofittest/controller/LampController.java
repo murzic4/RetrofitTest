@@ -3,12 +3,10 @@ package ru.mera.smamonov.retrofittest.controller;
 import android.util.Log;
 
 import java.util.List;
-import java.util.StringTokenizer;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.mera.smamonov.retrofittest.Adapters.RecycleViewAdapterLamp;
 import ru.mera.smamonov.retrofittest.com.tilgin.model.ApiResponse;
 import ru.mera.smamonov.retrofittest.com.tilgin.model.Lamp;
 
@@ -18,19 +16,19 @@ import ru.mera.smamonov.retrofittest.com.tilgin.model.Lamp;
 
 public class LampController {
 
-    interface FailureListener {
+    public interface FailureListener {
         void OnFailure(Throwable t);
     }
 
-    interface GetLampsListener extends FailureListener {
+    public interface GetLampsListener extends FailureListener {
         void OnSuccess(List<Lamp> lamps, String error);
     }
 
-    interface UpdateListener extends FailureListener {
+    public interface UpdateListener extends FailureListener {
         void OnSuccess(Lamp lamp, String error);
     }
 
-    interface GetLampListener extends FailureListener {
+    public interface GetLampListener extends FailureListener {
         void OnSuccess(Lamp lamp, String error);
     }
 
