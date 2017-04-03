@@ -1,7 +1,7 @@
 package ru.mera.smamonov.retrofittest.Activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void OnSuccess(Lamp lamp, String error) {
-                Log.d(LOG_TAG, "Lamp " + m_lamp.getUuid() + "was suceessfully updated");
+                Log.d(LOG_TAG, "Lamp " + m_lamp.getUuid() + "was successfully updated");
                 updateDeviceListener.onSuccess();
             }
 
