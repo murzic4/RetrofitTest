@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class ApiResponse {
 
+    public static final int RESULT_OK = 0;
+
     @SerializedName("code")
     @Expose
     private Integer code;

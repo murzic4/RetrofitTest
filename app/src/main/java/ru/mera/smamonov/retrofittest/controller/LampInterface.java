@@ -25,10 +25,10 @@ public interface LampInterface {
 
     @PUT("lamps/{device_id}/")
     Call<ApiResponse> setLamp(@Path("device_id") String device_id,
-                              @Query("swithced") Boolean swithced);
+                              @Query("switched") Boolean swithced);
 
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://192.168.0.2:8080/")
+            .baseUrl("http://192.168.56.1:8080/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 }

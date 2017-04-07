@@ -34,8 +34,7 @@ public class LampController {
 
     private LampInterface m_gitHubService = null;
 
-    public LampController()
-    {
+    public LampController() {
         m_gitHubService = LampInterface.retrofit.create(LampInterface.class);
     }
 
@@ -78,7 +77,7 @@ public class LampController {
     }
 
     public void getLamp(String device_id,
-                         final GetLampListener getLampListener) {
+                        final GetLampListener getLampListener) {
 
 
         Call<Lamp> call = m_gitHubService.getLamp(device_id);
@@ -123,9 +122,21 @@ public class LampController {
 
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                Log.e("Error", "onResponse: " + String.valueOf(response.isSuccessful()));
 
                 if (listener != null) {
-                    listener.OnSuccess(lamp, response.message());
+                    ApiResponse apiResponse = response.body();
+
+                    Log.e("Error", "apiResponse code: " + apiResponse.getCode());
+                    Log.e("Error", "apiResponse message: " + apiResponse.getMessage());
+
+                    if (response.isSuccessful() &&
+                            apiResponse != null &&
+                            apiResponse.getCode() == ApiResponse.RESULT_OK) {
+                        listener.OnSuccess(lamp, apiResponse.getMessage());
+                    } else {
+                        listener.OnSuccess(null, apiResponse.getMessage());
+                    }
                 }
             }
 

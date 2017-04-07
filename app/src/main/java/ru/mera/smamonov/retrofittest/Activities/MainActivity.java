@@ -34,8 +34,18 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void OnSuccess(Lamp lamp, String error) {
-                Log.d(LOG_TAG, "Lamp " + m_lamp.getUuid() + "was successfully updated");
-                updateDeviceListener.onSuccess();
+
+                if (lamp != null) {
+                    Log.d(LOG_TAG, "Lamp " + m_lamp.getUuid() + "was successfully updated");
+                    updateDeviceListener.onSuccess();
+                } else {
+                    if (error == null) {
+                        Log.d(LOG_TAG, "Unable to update Lamp " + m_lamp.getUuid());
+                    } else {
+                        Log.d(LOG_TAG, "Unable to update Lamp " + m_lamp.getUuid() + " reason:" + error);
+                    }
+                    updateDeviceListener.onFailure();
+                }
             }
 
             @Override
