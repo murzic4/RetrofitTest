@@ -26,34 +26,33 @@ public class MainActivity extends AppCompatActivity {
         void onFailure();
     }
 
-    public void updateLamp(final Lamp lamp, final UpdateDeviceListener updateDeviceListener) {
+    public void updateLamp(final Lamp lamp,
+                           final UpdateDeviceListener updateDeviceListener) {
         m_lampController.setLamp(lamp, new LampController.UpdateListener() {
-            final Lamp m_lamp = lamp;
-
-            final UpdateDeviceListener m_updateDeviceListener = updateDeviceListener;
 
             @Override
-            public void OnSuccess(Lamp lamp, String error) {
-
+            public void OnSuccess(Lamp lamp) {
                 if (lamp != null) {
-                    Log.d(LOG_TAG, "Lamp " + m_lamp.getUuid() + "was successfully updated");
+                    Log.d(LOG_TAG, "Lamp " + lamp.getUuid() + " was successfully updated");
                     updateDeviceListener.onSuccess();
-                } else {
-                    if (error == null) {
-                        Log.d(LOG_TAG, "Unable to update Lamp " + m_lamp.getUuid());
-                    } else {
-                        Log.d(LOG_TAG, "Unable to update Lamp " + m_lamp.getUuid() + " reason:" + error);
-                    }
-                    updateDeviceListener.onFailure();
                 }
             }
 
             @Override
             public void OnFailure(Throwable t) {
                 Log.e(LOG_TAG, "Unable to update Lamp " +
-                        m_lamp.getUuid() +
+                        lamp.getUuid() +
                         ", reason: " +
                         t.getMessage());
+                updateDeviceListener.onFailure();
+            }
+
+            @Override
+            public void OnFailure(String error) {
+                Log.e(LOG_TAG, "Unable to update Lamp " +
+                        lamp.getUuid() +
+                        ", reason: " +
+                        error);
                 updateDeviceListener.onFailure();
             }
         });
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         m_lampController.getLamps(new LampController.GetLampsListener() {
 
             @Override
-            public void OnSuccess(List<Lamp> lamps, String error) {
+            public void OnSuccess(List<Lamp> lamps) {
                 RecycleViewAdapterLamp adapter = new RecycleViewAdapterLamp(lamps, mainActivity);
                 m_recyRecyclerView.setAdapter(adapter);
             }
@@ -85,6 +84,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void OnFailure(Throwable t) {
                 Log.e(LOG_TAG, t.getMessage());
+            }
+
+            @Override
+            public void OnFailure(String error) {
+                Log.e(LOG_TAG, error);
             }
         });
     }

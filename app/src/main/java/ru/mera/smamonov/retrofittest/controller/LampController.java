@@ -16,20 +16,24 @@ import ru.mera.smamonov.retrofittest.com.tilgin.model.Lamp;
 
 public class LampController {
 
+    private final String LOG_TAG = "LampController";
+
     public interface FailureListener {
         void OnFailure(Throwable t);
+
+        void OnFailure(String error);
     }
 
     public interface GetLampsListener extends FailureListener {
-        void OnSuccess(List<Lamp> lamps, String error);
+        void OnSuccess(List<Lamp> lamps);
     }
 
     public interface UpdateListener extends FailureListener {
-        void OnSuccess(Lamp lamp, String error);
+        void OnSuccess(Lamp lamp);
     }
 
     public interface GetLampListener extends FailureListener {
-        void OnSuccess(Lamp lamp, String error);
+        void OnSuccess(Lamp lamp);
     }
 
     private LampInterface m_gitHubService = null;
@@ -49,16 +53,15 @@ public class LampController {
             @Override
             public void onResponse(Call<List<Lamp>> call, Response<List<Lamp>> response) {
 
-                List<Lamp> result = null;
-
-                if (response.isSuccessful()) {
-                    result = response.body();
-                } else {
-                    Log.d("Error:", response.message());
-                }
-
                 if (listener != null) {
-                    listener.OnSuccess(response.body(), response.message());
+
+                    if (response.isSuccessful()) {
+                        List<Lamp> result = response.body();
+                        listener.OnSuccess(result);
+                    } else {
+                        Log.e(LOG_TAG, "onResponse" + response.message());
+                        listener.OnFailure(response.message());
+                    }
                 }
             }
 
@@ -68,7 +71,7 @@ public class LampController {
              */
             @Override
             public void onFailure(Call<List<Lamp>> call, Throwable t) {
-                Log.e("Error", t.getMessage());
+                Log.e(LOG_TAG, "onFailure: " + t.getMessage());
                 if (listener != null) {
                     listener.OnFailure(t);
                 }
@@ -79,7 +82,6 @@ public class LampController {
     public void getLamp(String device_id,
                         final GetLampListener getLampListener) {
 
-
         Call<Lamp> call = m_gitHubService.getLamp(device_id);
         call.enqueue(new Callback<Lamp>() {
 
@@ -88,24 +90,21 @@ public class LampController {
             @Override
             public void onResponse(Call<Lamp> call, Response<Lamp> response) {
 
-                Lamp result = null;
-
-                if (response.isSuccessful()) {
-                    // tasks available
-                    result = response.body();
-                } else {
-                    Log.d("Error:", response.message());
-                }
-
                 if (listener != null) {
-                    listener.OnSuccess(result, response.message());
+                    if (response.isSuccessful()) {
+                        Lamp result = response.body();
+                        listener.OnSuccess(result);
+                    } else {
+                        Log.e(LOG_TAG, "onResponse" + response.message());
+                        listener.OnFailure(response.message());
+                    }
+
                 }
             }
 
             @Override
             public void onFailure(Call<Lamp> call, Throwable t) {
-
-                Log.e("Error", t.getMessage());
+                Log.e(LOG_TAG, "onFailure: " + t.getMessage());
                 if (listener != null) {
                     listener.OnFailure(t);
                 }
@@ -127,15 +126,14 @@ public class LampController {
                 if (listener != null) {
                     ApiResponse apiResponse = response.body();
 
-                    Log.e("Error", "apiResponse code: " + apiResponse.getCode());
-                    Log.e("Error", "apiResponse message: " + apiResponse.getMessage());
+                    Log.d(LOG_TAG, "apiResponse code: " + apiResponse.getCode());
+                    Log.d(LOG_TAG, "apiResponse message: " + apiResponse.getMessage());
 
                     if (response.isSuccessful() &&
-                            apiResponse != null &&
                             apiResponse.getCode() == ApiResponse.RESULT_OK) {
-                        listener.OnSuccess(lamp, apiResponse.getMessage());
+                        listener.OnSuccess(lamp);
                     } else {
-                        listener.OnSuccess(null, apiResponse.getMessage());
+                        listener.OnFailure(apiResponse.getMessage());
                     }
                 }
             }
