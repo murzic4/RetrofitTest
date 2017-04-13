@@ -18,7 +18,7 @@ import ru.mera.smamonov.retrofittest.model.Lamp;
 
 public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    static private String LOG_TAG = "LampsRecycleViewAdapter";
+    static private String LOG_TAG = "LampsAdapter";
 
     public interface SetLampListener {
         void onLampSet(final Lamp lamp);
@@ -90,7 +90,7 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         */
         lampViewHolder.setActualView();
 
-        lampViewHolder.m_lamp.addListener(new GenericDevice.DeviceListener() {
+        lampViewHolder.m_lamp.addListener(lampViewHolder, new GenericDevice.DeviceListener() {
             @Override
             public void onDelete() {
                 throw new UnsupportedOperationException();

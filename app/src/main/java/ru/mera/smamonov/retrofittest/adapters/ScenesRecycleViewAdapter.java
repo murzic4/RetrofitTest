@@ -1,5 +1,7 @@
 package ru.mera.smamonov.retrofittest.adapters;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,10 +33,104 @@ import ru.mera.smamonov.retrofittest.model.Scene;
 
 public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    static private final String LOG_TAG = "ScenesRecycleViewAdapter";
+    static private final String LOG_TAG = "ScenesAdapter";
     private List<Scene> m_scenes = null;
     private ScenesActivity m_parent_activity = null;
 
+    void updateSceneList() {
+        notifyDataSetChanged();
+    }
+
+    void saveScene(final Scene scene) {
+
+        Log.d(LOG_TAG, "Saving scene " + scene.getUuid() + " ...");
+
+        Toast.makeText(m_parent_activity,
+                "Saving scene " + scene.getUuid(),
+                Toast.LENGTH_SHORT).show();
+
+        AppContext.getIotManager().setScene(scene,
+                new IotManager.SetListener<Scene>() {
+                    @Override
+                    public void OnSuccess(Scene device) {
+                        Log.e(LOG_TAG, "Scene saved " + scene.getUuid());
+                        notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void OnFailure(Throwable t) {
+                        Log.e(LOG_TAG,
+                                "Unable to set: " + scene.getUuid() + " reason:" + t.getMessage());
+                        notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void OnFailure(String error) {
+                        Log.e(LOG_TAG,
+                                "Unable to set: " + scene.getUuid() + " reason:" + error);
+                        notifyDataSetChanged();
+                    }
+                });
+    }
+
+    void activateScene(final Scene scene) {
+
+        Log.d(LOG_TAG, "Activate scene " + scene.getUuid() + " ...");
+
+        Toast.makeText(m_parent_activity,
+                "Activating scene " + scene.getUuid(),
+                Toast.LENGTH_SHORT).show();
+
+        scene.setActivated(true);
+
+        saveScene(scene);
+    }
+
+    void deleteScene(final Scene scene) {
+        Toast.makeText(m_parent_activity,
+                "Deleting scene " + scene.getUuid() + " ...",
+                Toast.LENGTH_SHORT).show();
+
+        AppContext.getIotManager().deleteScene(scene,
+                new IotManager.DeleteListener<Scene>() {
+                    @Override
+                    public void OnSuccess(Scene device) {
+                        Toast.makeText(m_parent_activity,
+                                "Scene " +
+                                        scene.getUuid() +
+                                        " was successfully removed",
+                                Toast.LENGTH_SHORT).show();
+                        m_scenes.remove(scene);
+                        updateSceneList();
+                    }
+
+                    @Override
+                    public void OnFailure(Throwable t) {
+                        Toast.makeText(m_parent_activity,
+                                "Unable to delete Scene " +
+                                        scene.getUuid() +
+                                        ", reason: " +
+                                        t.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                        //TODO: remove this in release
+                        m_scenes.remove(scene);
+                        updateSceneList();
+                    }
+
+                    @Override
+                    public void OnFailure(String error) {
+                        Toast.makeText(m_parent_activity,
+                                "Unable to delete Scene " +
+                                        scene.getUuid() +
+                                        ", reason: " +
+                                        error,
+                                Toast.LENGTH_SHORT).show();
+                        //TODO: remove this in release
+                        m_scenes.remove(scene);
+                        updateSceneList();
+                    }
+                });
+    }
 
     public class SceneViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
@@ -62,6 +158,11 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
             m_scene_uuid.setText(m_scene.getUuid());
             m_switch.setChecked(m_scene.getActivated());
         }
+/*
+        void delete() {
+
+        }
+        */
     }
 
     public ScenesRecycleViewAdapter(List<Scene> scenes,
@@ -78,17 +179,29 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         sceneViewHolder.m_scene = scene;
         sceneViewHolder.setActualView();
 
-        sceneViewHolder.m_scene.addListener(new GenericDevice.DeviceListener() {
-            @Override
-            public void onDelete() {
-                throw new UnsupportedOperationException();
-            }
+        sceneViewHolder.m_scene.addListener(sceneViewHolder,
+                new GenericDevice.DeviceListener() {
 
-            @Override
-            public void onUpdate() {
-                sceneViewHolder.setActualView();
-            }
-        });
+                    @Override
+                    public void onDelete() {
+
+                        int position = sceneViewHolder.getAdapterPosition();
+
+                        Log.e(LOG_TAG, "Remove position " +
+                                Integer.toString(position) +
+                                " UUID:" +
+                                scene.getUuid());
+
+                        m_scenes.remove(position);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(0, m_scenes.size());
+                    }
+
+                    @Override
+                    public void onUpdate() {
+                        sceneViewHolder.setActualView();
+                    }
+                });
 
         LampsRecycleViewAdapter adapter = new LampsRecycleViewAdapter(scene.getDevices(),
                 m_parent_activity,
@@ -120,26 +233,59 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
                         switch (item.getItemId()) {
 
-                            case R.id.menu_scene_save:
-                                Toast.makeText(m_parent_activity,
-                                        "Saving scene " + sceneViewHolder.m_scene.getUuid(),
-                                        Toast.LENGTH_SHORT).show();
+                            case R.id.menu_scene_save: {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_activity);
+                                builder.setMessage(R.string.update_scene_caption)
+                                        .setPositiveButton(R.string.update_scene_ok,
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        saveScene(sceneViewHolder.m_scene);
+                                                    }
+                                                })
+                                        .setNegativeButton(R.string.update_scene_cancel,
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+
+                                                    }
+                                                });
+
+                                AlertDialog alert = builder.create();
+                                alert.show();
                                 return true;
-                            case R.id.menu_scene_activate:
-                                Toast.makeText(m_parent_activity,
-                                        "Activating scene " + sceneViewHolder.m_scene.getUuid(),
-                                        Toast.LENGTH_SHORT).show();
+                            }
+                            case R.id.menu_scene_activate: {
+                                activateScene(sceneViewHolder.m_scene);
                                 return true;
-                            case R.id.menu_scene_add_remove_elements:
+                            }
+                            case R.id.menu_scene_add_remove_elements: {
                                 Toast.makeText(m_parent_activity,
                                         "Add/remove elemnts in scene " + sceneViewHolder.m_scene.getUuid(),
                                         Toast.LENGTH_SHORT).show();
                                 return true;
-                            case R.id.menu_scene_delete:
-                                Toast.makeText(m_parent_activity,
-                                        "Deleting scene " + sceneViewHolder.m_scene.getUuid(),
-                                        Toast.LENGTH_SHORT).show();
+                            }
+                            case R.id.menu_scene_delete: {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_activity);
+                                builder.setMessage(R.string.delete_scene_caption)
+                                        .setPositiveButton(R.string.delete_scene_ok,
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        deleteScene(sceneViewHolder.m_scene);
+                                                    }
+                                                })
+                                        .setNegativeButton(R.string.delete_scene_cancel,
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        Toast.makeText(m_parent_activity,
+                                                                "Deleting scene " + sceneViewHolder.m_scene.getUuid() + " cancelled",
+                                                                Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+
+                                AlertDialog alert = builder.create();
+                                alert.show();
+
                                 return true;
+                            }
                             default:
                                 return false;
 
@@ -163,48 +309,13 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
         sceneViewHolder.
                 itemView.
-                setOnClickListener(new View.OnClickListener()
-
-                                   {
+                setOnClickListener(new View.OnClickListener() {
                                        final Scene m_scene = scene;
                                        final SceneViewHolder m_sceneViewHolder = sceneViewHolder;
 
                                        @Override
                                        public void onClick(View v) {
-
-                                           scene.setActivated(!scene.getActivated());
-
-                                           Log.d(LOG_TAG, "Scene click " + sceneViewHolder.m_scene.getUuid());
-
-                                           AppContext.getIotManager().setScene(m_scene,
-                                                   new IotManager.SetListener<Scene>() {
-                                                       @Override
-                                                       public void OnSuccess(Scene device) {
-                                                           Log.e(LOG_TAG, "Scene saved " + m_scene.getUuid());
-                                                           device.Update();
-                                                       }
-
-                                                       @Override
-                                                       public void OnFailure(Throwable t) {
-                                                           Log.e(LOG_TAG,
-                                                                   "Unable to set: " +
-                                                                           m_scene.getUuid() +
-                                                                           " reason:" +
-                                                                           t.getMessage());
-
-                                                           m_scene.Update();
-                                                       }
-
-                                                       @Override
-                                                       public void OnFailure(String error) {
-                                                           Log.e(LOG_TAG,
-                                                                   "Unable to set: " +
-                                                                           m_scene.getUuid() +
-                                                                           " reason:" +
-                                                                           error);
-                                                           m_scene.Update();
-                                                       }
-                                                   });
+                                           activateScene(m_scene);
                                        }
                                    }
                 );
@@ -223,4 +334,5 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public int getItemCount() {
         return this.m_scenes.size();
     }
+
 }

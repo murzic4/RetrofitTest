@@ -270,8 +270,8 @@ public class IotManager {
         });
     }
 
-    void createScene(final Scene device,
-                     final IotManager.CreateListener<Scene> createListener) {
+    public void createScene(final Scene device,
+                            final IotManager.CreateListener<Scene> createListener) {
 
         Call<ApiResponse> response = m_interface.createScene(device);
 
@@ -306,8 +306,8 @@ public class IotManager {
         });
     }
 
-    void deleteScene(final Scene device,
-                     final IotManager.DeleteListener<Scene> deleteListener) {
+    public void deleteScene(final Scene device,
+                            final IotManager.DeleteListener<Scene> deleteListener) {
 
         Call<ApiResponse> response = m_interface.deleteScene(device.getUuid());
 

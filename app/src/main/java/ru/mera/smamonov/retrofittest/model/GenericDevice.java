@@ -1,10 +1,9 @@
 package ru.mera.smamonov.retrofittest.model;
 
+import android.util.Log;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by sergeym on 13.04.2017.
@@ -40,25 +39,71 @@ public abstract class GenericDevice {
         void onUpdate();
     }
 
-    public void addListener(DeviceListener listener) {
-        m_listeners.add(listener);
+
+    public void addListener(Object observer,
+                            DeviceListener listener) {
+        if (listener != null && observer != null) {
+            Log.e("GenericDevice", "addListener " +
+                    observer +
+                    " UUID:" +
+                    getUuid());
+            m_listener = listener;
+        } else {
+            throw new NullPointerException();
+        }
+    }
+
+    /*public void addListener(Object observer,
+                            DeviceListener listener) {
+        if (listener != null && observer != null) {
+            Log.e("GenericDevice", "addListener " +
+                    observer +
+                    " UUID:" +
+                    getUuid());
+            m_listeners.put(observer, listener);
+        } else {
+            throw new NullPointerException();
+        }
     }
 
     public void Update() {
         if (m_listeners != null) {
-            for (DeviceListener listener : m_listeners) {
-                listener.onUpdate();
+            for (Hashtable.Entry entity : m_listeners.entrySet()) {
+                DeviceListener listener = (DeviceListener) entity.getValue();
+
+                if (listener != null) {
+                    listener.onUpdate();
+                }
             }
         }
     }
 
     public void Delete() {
         if (m_listeners != null) {
-            for (DeviceListener listener : m_listeners) {
-                listener.onDelete();
+            for (Hashtable.Entry entity : m_listeners.entrySet()) {
+                DeviceListener listener = (DeviceListener) entity.getValue();
+
+                if (listener != null) {
+                    listener.onDelete();
+                }
             }
         }
     }
 
-    transient private List<DeviceListener> m_listeners = new LinkedList();
+    transient private Hashtable<Object, DeviceListener> m_listeners = new Hashtable<>();
+    */
+
+    public void Update() {
+        if (m_listener != null) {
+            m_listener.onUpdate();
+        }
+    }
+
+    public void Delete() {
+        if (m_listener != null) {
+            m_listener.onDelete();
+        }
+    }
+
+    transient private DeviceListener m_listener = null;
 }
