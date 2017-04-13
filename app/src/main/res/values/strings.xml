@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RetrofitTest</string>
+    <string name="title_activity_scenes">ScenesActivity</string>
 </resources>
