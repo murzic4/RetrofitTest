@@ -12,8 +12,8 @@ import android.widget.TextView;
 import java.util.List;
 
 import ru.mera.smamonov.retrofittest.R;
-import ru.mera.smamonov.retrofittest.com.tilgin.model.GenericDevice;
-import ru.mera.smamonov.retrofittest.com.tilgin.model.Lamp;
+import ru.mera.smamonov.retrofittest.model.GenericDevice;
+import ru.mera.smamonov.retrofittest.model.Lamp;
 
 
 public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

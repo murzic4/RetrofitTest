@@ -15,9 +15,9 @@ import java.util.List;
 
 import ru.mera.smamonov.retrofittest.R;
 import ru.mera.smamonov.retrofittest.adapters.ScenesRecycleViewAdapter;
-import ru.mera.smamonov.retrofittest.com.tilgin.model.Scene;
 import ru.mera.smamonov.retrofittest.context.AppContext;
 import ru.mera.smamonov.retrofittest.controller.IotManager;
+import ru.mera.smamonov.retrofittest.model.Scene;
 
 public class ScenesActivity extends AppCompatActivity {
 

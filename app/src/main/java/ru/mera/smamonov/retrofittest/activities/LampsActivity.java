@@ -10,9 +10,9 @@ import java.util.List;
 
 import ru.mera.smamonov.retrofittest.R;
 import ru.mera.smamonov.retrofittest.adapters.LampsRecycleViewAdapter;
-import ru.mera.smamonov.retrofittest.com.tilgin.model.Lamp;
 import ru.mera.smamonov.retrofittest.context.AppContext;
 import ru.mera.smamonov.retrofittest.controller.IotManager;
+import ru.mera.smamonov.retrofittest.model.Lamp;
 
 public class LampsActivity extends AppCompatActivity {
 

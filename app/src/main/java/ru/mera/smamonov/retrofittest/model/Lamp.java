@@ -1,4 +1,4 @@
-package ru.mera.smamonov.retrofittest.com.tilgin.model;
+package ru.mera.smamonov.retrofittest.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

@@ -7,9 +7,9 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.mera.smamonov.retrofittest.com.tilgin.model.ApiResponse;
-import ru.mera.smamonov.retrofittest.com.tilgin.model.Lamp;
-import ru.mera.smamonov.retrofittest.com.tilgin.model.Scene;
+import ru.mera.smamonov.retrofittest.model.ApiResponse;
+import ru.mera.smamonov.retrofittest.model.Lamp;
+import ru.mera.smamonov.retrofittest.model.Scene;
 
 /**
  * Created by sergeym on 31.03.2017.
