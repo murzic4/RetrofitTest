@@ -3,38 +3,15 @@ package ru.mera.smamonov.retrofittest.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 public class Lamp extends GenericDevice {
-    /*
-    @SerializedName("name")
-    @Expose
-    private String name;
-    @SerializedName("uuid")
-    @Expose
-    private String uuid;
-    */
     @SerializedName("switched")
     @Expose
     private Boolean switched;
 
-    /*
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getUuid() {
-            return uuid;
-        }
-
-        public void setUuid(String uuid) {
-            this.uuid = uuid;
-        }
-    */
     public Boolean getSwitched() {
         return switched;
     }
@@ -43,7 +20,8 @@ public class Lamp extends GenericDevice {
         this.switched = switched;
     }
 
-    static int index = 0;
+    transient static int index = 0;
+    transient static List<Lamp> m_list = new LinkedList();
 
     public static Lamp generate() {
         Lamp result = new Lamp();
@@ -55,6 +33,11 @@ public class Lamp extends GenericDevice {
                 new Boolean(false));
 
         index++;
+        m_list.add(result);
         return result;
+    }
+
+    public static List<Lamp> getList() {
+        return m_list;
     }
 }

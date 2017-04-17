@@ -39,39 +39,40 @@ public class LampsActivity extends AppCompatActivity {
             public void OnSuccess(List<Lamp> lamps) {
                 LampsRecycleViewAdapter adapter = new LampsRecycleViewAdapter(lamps,
                         lampsActivity,
-                        new LampsRecycleViewAdapter.SetLampListener() {
-                            @Override
-                            public void onLampSet(final Lamp lamp) {
-                                Log.d(LOG_TAG, "lamp_layout state is " + lamp.getSwitched());
-                                Log.d(LOG_TAG, "lamp_layout state change_to " + lamp.getSwitched());
-                                AppContext.getIotManager().setLamp(lamp,
-                                        new IotManager.SetListener<Lamp>() {
-                                            @Override
-                                            public void OnFailure(Throwable t) {
-                                                Log.e(LOG_TAG,
-                                                        "Unable to set: " +
-                                                                lamp.getUuid() +
-                                                                " reason:" +
-                                                                t.getMessage());
-                                            }
-
-                                            @Override
-                                            public void OnFailure(String error) {
-                                                Log.e(LOG_TAG,
-                                                        "Unable to set: " +
-                                                                lamp.getUuid() +
-                                                                " reason:" +
-                                                                error);
-                                            }
-
-                                            @Override
-                                            public void OnSuccess(Lamp lamp) {
-                                                lamp.Update();
-                                            }
-                                        }
-                                );
-                            }
-                        });
+                        null);
+//                        new LampsRecycleViewAdapter.SetLampListener() {
+//                            @Override
+//                            public void onLampSet(final Lamp lamp) {
+//                                Log.d(LOG_TAG, "lamp_layout state is " + lamp.getSwitched());
+//                                Log.d(LOG_TAG, "lamp_layout state change_to " + lamp.getSwitched());
+//                                AppContext.getIotManager().setLamp(lamp,
+//                                        new IotManager.SetListener<Lamp>() {
+//                                            @Override
+//                                            public void OnFailure(Throwable t) {
+//                                                Log.e(LOG_TAG,
+//                                                        "Unable to set: " +
+//                                                                lamp.getUuid() +
+//                                                                " reason:" +
+//                                                                t.getMessage());
+//                                            }
+//
+//                                            @Override
+//                                            public void OnFailure(String error) {
+//                                                Log.e(LOG_TAG,
+//                                                        "Unable to set: " +
+//                                                                lamp.getUuid() +
+//                                                                " reason:" +
+//                                                                error);
+//                                            }
+//
+//                                            @Override
+//                                            public void OnSuccess(Lamp lamp) {
+//                                                lamp.Update();
+//                                            }
+//                                        }
+//                                );
+//                            }
+//                        });
                 m_recyRecyclerView.setAdapter(adapter);
             }
 

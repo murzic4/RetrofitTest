@@ -1,7 +1,5 @@
 package ru.mera.smamonov.retrofittest.model;
 
-import android.util.Log;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -33,6 +31,7 @@ public abstract class GenericDevice {
         this.uuid = uuid;
     }
 
+    /*
     public interface DeviceListener {
         void onDelete();
 
@@ -53,7 +52,9 @@ public abstract class GenericDevice {
         }
     }
 
-    /*public void addListener(Object observer,
+    */
+    /*
+    public void addListener(Object observer,
                             DeviceListener listener) {
         if (listener != null && observer != null) {
             Log.e("GenericDevice", "addListener " +
@@ -92,7 +93,7 @@ public abstract class GenericDevice {
 
     transient private Hashtable<Object, DeviceListener> m_listeners = new Hashtable<>();
     */
-
+/*
     public void Update() {
         if (m_listener != null) {
             m_listener.onUpdate();
@@ -106,4 +107,5 @@ public abstract class GenericDevice {
     }
 
     transient private DeviceListener m_listener = null;
+    */
 }

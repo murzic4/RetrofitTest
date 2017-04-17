@@ -13,15 +13,6 @@ import java.util.UUID;
  */
 
 public class Scene extends GenericDevice {
-    /*
-    @SerializedName("name")
-    @Expose
-    private String name;
-
-    @SerializedName("uuid")
-    @Expose
-    private String uuid;
-*/
     @SerializedName("devices")
     @Expose
     private List<Lamp> devices;
@@ -30,23 +21,6 @@ public class Scene extends GenericDevice {
     @Expose
     private Boolean activated;
 
-    /*
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getUuid() {
-            return uuid;
-        }
-
-        public void setUuid(String uuid) {
-            this.uuid = uuid;
-        }
-    */
     public List<Lamp> getDevices() {
         return devices;
     }

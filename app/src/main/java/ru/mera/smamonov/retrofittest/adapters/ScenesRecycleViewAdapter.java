@@ -17,6 +17,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import ru.mera.smamonov.retrofittest.R;
@@ -39,6 +40,87 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     void updateSceneList() {
         notifyDataSetChanged();
+    }
+
+    public void createScene() {
+        Toast.makeText(m_parent_activity,
+                "Add scene ...",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    public void modifyListDevices(final Scene scene) {
+        Toast.makeText(m_parent_activity,
+                "Add/remove elemnts in scene " + scene.getUuid(),
+                Toast.LENGTH_SHORT).show();
+
+        AppContext.getIotManager().getLamps(new IotManager.GetListListener<Lamp>() {
+            @Override
+            public void OnSuccess(final List<Lamp> lamps) {
+
+                List<String> device_names = new LinkedList();
+                List<Boolean> device_used_in_scene = new LinkedList();
+                boolean[] device_used_flags = new boolean[lamps.size()];
+                int device_index = 0;
+
+                for (GenericDevice device : lamps) {
+                    device_names.add(device.getName());
+                    device_used_flags[device_index] = scene.getDevices().contains(device);
+                    device_index++;
+                }
+
+                final CharSequence[] names_array = device_names.toArray(new CharSequence[device_names.size()]);
+                final List<Lamp> copy_of_devices_list = new LinkedList<Lamp>(scene.getDevices());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_activity);
+                builder.setTitle("Title")
+                        .setMultiChoiceItems(names_array,
+                                device_used_flags,
+                                new DialogInterface.OnMultiChoiceClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog,
+                                                        int which,
+                                                        boolean isChecked) {
+
+                                        Lamp lamp = lamps.get(which);
+
+                                        if (isChecked) {
+                                            // If the user checked the item, add it to the selected items
+                                            copy_of_devices_list.add(lamp);
+                                        } else if (copy_of_devices_list.contains(lamp)) {
+                                            // Else, if the item is already in the array, remove it
+                                            copy_of_devices_list.remove(lamp);
+                                        }
+                                    }
+                                }).setPositiveButton(R.string.update_scene_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        scene.setDevices(copy_of_devices_list);
+                        updateSceneList();
+                    }
+                }).setNegativeButton(R.string.update_scene_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        updateSceneList();
+                    }
+                });
+
+                builder.create();
+                builder.show();
+            }
+
+            @Override
+            public void OnFailure(Throwable t) {
+                Log.e(LOG_TAG, "Unable to obtain list of devices, reason:" + t.getMessage());
+
+                //TODO: remove this code:
+                OnSuccess(Lamp.getList());
+            }
+
+            @Override
+            public void OnFailure(String error) {
+                Log.e(LOG_TAG, "Unable to obtain list of devices, reason:" + error);
+            }
+        });
     }
 
     void saveScene(final Scene scene) {
@@ -96,9 +178,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     @Override
                     public void OnSuccess(Scene device) {
                         Toast.makeText(m_parent_activity,
-                                "Scene " +
-                                        scene.getUuid() +
-                                        " was successfully removed",
+                                "Scene " + scene.getUuid() + " was successfully removed",
                                 Toast.LENGTH_SHORT).show();
                         m_scenes.remove(scene);
                         updateSceneList();
@@ -107,10 +187,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     @Override
                     public void OnFailure(Throwable t) {
                         Toast.makeText(m_parent_activity,
-                                "Unable to delete Scene " +
-                                        scene.getUuid() +
-                                        ", reason: " +
-                                        t.getMessage(),
+                                "Unable to delete Scene " + scene.getUuid() + ", reason: " + t.getMessage(),
                                 Toast.LENGTH_SHORT).show();
                         //TODO: remove this in release
                         m_scenes.remove(scene);
@@ -120,10 +197,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     @Override
                     public void OnFailure(String error) {
                         Toast.makeText(m_parent_activity,
-                                "Unable to delete Scene " +
-                                        scene.getUuid() +
-                                        ", reason: " +
-                                        error,
+                                "Unable to delete Scene " + scene.getUuid() + ", reason: " + error,
                                 Toast.LENGTH_SHORT).show();
                         //TODO: remove this in release
                         m_scenes.remove(scene);
@@ -158,11 +232,6 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
             m_scene_uuid.setText(m_scene.getUuid());
             m_switch.setChecked(m_scene.getActivated());
         }
-/*
-        void delete() {
-
-        }
-        */
     }
 
     public ScenesRecycleViewAdapter(List<Scene> scenes,
@@ -179,36 +248,14 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         sceneViewHolder.m_scene = scene;
         sceneViewHolder.setActualView();
 
-        sceneViewHolder.m_scene.addListener(sceneViewHolder,
-                new GenericDevice.DeviceListener() {
-
-                    @Override
-                    public void onDelete() {
-
-                        int position = sceneViewHolder.getAdapterPosition();
-
-                        Log.e(LOG_TAG, "Remove position " +
-                                Integer.toString(position) +
-                                " UUID:" +
-                                scene.getUuid());
-
-                        m_scenes.remove(position);
-                        notifyItemRemoved(position);
-                        notifyItemRangeChanged(0, m_scenes.size());
-                    }
-
-                    @Override
-                    public void onUpdate() {
-                        sceneViewHolder.setActualView();
-                    }
-                });
-
         LampsRecycleViewAdapter adapter = new LampsRecycleViewAdapter(scene.getDevices(),
                 m_parent_activity,
                 new LampsRecycleViewAdapter.SetLampListener() {
                     @Override
                     public void onLampSet(Lamp lamp) {
-                        lamp.Update();
+                        lamp.setSwitched(!lamp.getSwitched());
+                        //sceneViewHolder.setActualView();
+                        updateSceneList();
                     }
                 });
 
@@ -219,13 +266,12 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
         {
             @Override
-            public void onClick(View v) {
-                Log.e(LOG_TAG, "m_menu_image click ");
+            public void onClick(View view) {
 
                 final PopupMenu popup_menu = new PopupMenu(m_parent_activity,
-                        v);
+                        view);
                 MenuInflater inflate = popup_menu.getMenuInflater();
-                inflate.inflate(R.layout.scene_popup_menu, popup_menu.getMenu());
+                inflate.inflate(R.menu.scene_popup_menu, popup_menu.getMenu());
 
                 popup_menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -258,9 +304,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                                 return true;
                             }
                             case R.id.menu_scene_add_remove_elements: {
-                                Toast.makeText(m_parent_activity,
-                                        "Add/remove elemnts in scene " + sceneViewHolder.m_scene.getUuid(),
-                                        Toast.LENGTH_SHORT).show();
+                                modifyListDevices(sceneViewHolder.m_scene);
                                 return true;
                             }
                             case R.id.menu_scene_delete: {

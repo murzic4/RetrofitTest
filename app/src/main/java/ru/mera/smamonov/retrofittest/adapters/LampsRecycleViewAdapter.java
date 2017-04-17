@@ -3,30 +3,78 @@ package ru.mera.smamonov.retrofittest.adapters;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
 import ru.mera.smamonov.retrofittest.R;
-import ru.mera.smamonov.retrofittest.model.GenericDevice;
+import ru.mera.smamonov.retrofittest.context.AppContext;
+import ru.mera.smamonov.retrofittest.controller.IotManager;
 import ru.mera.smamonov.retrofittest.model.Lamp;
 
 
 public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    public interface SetLampListener
+
+    {
+        void onLampSet(final Lamp lamp);
+    }
+
     static private String LOG_TAG = "LampsAdapter";
 
-    public interface SetLampListener {
-        void onLampSet(final Lamp lamp);
+    void updateLampList() {
+        notifyDataSetChanged();
+    }
+
+    void switchLamp(final Lamp lamp) {
+        lamp.setSwitched(!lamp.getSwitched());
+        saveLamp(lamp);
+    }
+
+    void saveLamp(final Lamp lamp) {
+
+        Log.d(LOG_TAG, "Saving lamp " + lamp.getUuid() + " ...");
+
+        Toast.makeText(m_parent_activity,
+                "Saving lamp " + lamp.getUuid(),
+                Toast.LENGTH_SHORT).show();
+
+        AppContext.getIotManager().setLamp(lamp,
+                new IotManager.SetListener<Lamp>() {
+                    @Override
+                    public void OnSuccess(Lamp device) {
+                        Log.e(LOG_TAG, "Lamp saved " + lamp.getUuid());
+                        updateLampList();
+                    }
+
+                    @Override
+                    public void OnFailure(Throwable t) {
+                        Log.e(LOG_TAG,
+                                "Unable to set: " + lamp.getUuid() + " reason:" + t.getMessage());
+                        //TODO: remove this:
+                        updateLampList();
+                    }
+
+                    @Override
+                    public void OnFailure(String error) {
+                        Log.e(LOG_TAG,
+                                "Unable to set: " + lamp.getUuid() + " reason:" + error);
+                        //TODO: remove this:
+                        updateLampList();
+                    }
+                });
     }
 
     private List<Lamp> m_lamps = null;
     private AppCompatActivity m_parent_activity = null;
-    private SetLampListener m_set_lamp_listener = null;
+    private SetLampListener m_lamp_set_listener = null;
 
     public class LampViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
@@ -69,10 +117,7 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                                    final SetLampListener set_lamp_listener) {
         this.m_lamps = lamps;
         this.m_parent_activity = parent_activity;
-
-        if (set_lamp_listener != null) {
-            m_set_lamp_listener = set_lamp_listener;
-        }
+        this.m_lamp_set_listener = set_lamp_listener;
     }
 
     @Override
@@ -83,62 +128,24 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         lampViewHolder.m_lamp = lamp;
 
-        /*
-        lampViewHolder.m_lamp_name.setText(lamp.getName());
-        lampViewHolder.m_lamp_uuid.setText(lamp.getUuid());
-        lampViewHolder.setActualPicture();
-        */
         lampViewHolder.setActualView();
-
-        lampViewHolder.m_lamp.addListener(lampViewHolder, new GenericDevice.DeviceListener() {
-            @Override
-            public void onDelete() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void onUpdate() {
-                lampViewHolder.setActualView();
-            }
-        });
 
         lampViewHolder.
                 itemView.
                 setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           if (m_set_lamp_listener != null) {
-                                               lampViewHolder.m_lamp.setSwitched(!lampViewHolder.m_lamp.getSwitched());
-                                               m_set_lamp_listener.onLampSet(lampViewHolder.m_lamp);
-                                           }
-                                           /*
-                                           //Lamp lamp_to_be_updated = lamp_layout;
-                                           Log.d("===>", "lamp_layout state is " + lampViewHolder.m_lamp.getSwitched());
-                                           lampViewHolder.m_lamp.setSwitched(!lampViewHolder.m_lamp.getSwitched());
-                                           Log.d("===>", "lamp_layout state change_to " + lampViewHolder.m_lamp.getSwitched());
-                                           //lamp_layout.setSwitched(!lamp_layout.getSwitched());
-                                           AppContext.getIotManager().setLamp(lampViewHolder.m_lamp,
-                                                   new IotManager.SetListener<Lamp>() {
-                                                       @Override
-                                                       public void OnFailure(Throwable t) {
-
-                                                       }
-
-                                                       @Override
-                                                       public void OnFailure(String error) {
-
-                                                       }
-
-                                                       @Override
-                                                       public void OnSuccess(Lamp lamp) {
-                                                           lampViewHolder.setActualPicture();
-                                                       }
-                                                   }
-                                           );
-                                           */
-                                       }
-                                   }
-                );
+                    @Override
+                    public void onClick(View v) {
+                        if (m_lamp_set_listener == null) {
+                            Log.d(LOG_TAG,
+                                    "Executing default click listener for Lamp:" + lamp.getUuid());
+                            switchLamp(lampViewHolder.m_lamp);
+                        } else {
+                            Log.d(LOG_TAG,
+                                    "Executing custom click listener for Lamp:" + lamp.getUuid());
+                            m_lamp_set_listener.onLampSet(lamp);
+                        }
+                    }
+                });
     }
 
     @Override

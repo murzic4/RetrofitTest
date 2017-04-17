@@ -13,7 +13,6 @@
         android:theme="@style/AppTheme"
         android:name=".context.AppContext">
         <activity android:name=".activities.LampsActivity">
-
         </activity>
         <activity
             android:name=".activities.ScenesActivity"
