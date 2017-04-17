@@ -39,30 +39,6 @@
                 android:background="@null"
                 android:src="@drawable/ic_menu" />
 
-            <!--
-                        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-                            android:id="@+id/scene_toolbar"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentTop="true"
-                            android:layout_toRightOf="@+id/scene_name"
-                            android:gravity="top|right">
-
-                            <item
-                                android:id="@+id/Not_interasted_catugury"
-                                android:orderInCategory="100"
-                                android:title="Never show stories from this category  "></item>
-
-                            <item
-                                android:id="@+id/No_interasted"
-                                android:orderInCategory="101"
-                                android:title="Not Interested">
-
-                            </item>
-
-        </android.support.v7.widget.Toolbar>
-        -->
-
             <TextView
                 android:id="@+id/scene_uuid"
                 android:layout_width="match_parent"

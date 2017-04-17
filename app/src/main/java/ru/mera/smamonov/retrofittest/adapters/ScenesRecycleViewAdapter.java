@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -38,17 +39,184 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private List<Scene> m_scenes = null;
     private ScenesActivity m_parent_activity = null;
 
+    private interface ModifyDeviceListListener {
+        void onModify();
+    }
+
     void updateSceneList() {
         notifyDataSetChanged();
+    }
+
+    void getAndUpdateScenesList() {
+        AppContext.getIotManager().getScenes(new IotManager.GetListListener<Scene>() {
+            @Override
+            public void OnSuccess(List<Scene> devices) {
+                Log.e(LOG_TAG, "Obtaining list of scenes");
+                m_scenes.clear();
+                m_scenes.addAll(devices);
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public void OnFailure(Throwable t) {
+                Log.e(LOG_TAG, "Unable to obtain list of scenes, reason:" + t.getMessage());
+            }
+
+            @Override
+            public void OnFailure(String error) {
+                Log.e(LOG_TAG, "Unable to obtain list of scenes, reason:" + error);
+            }
+        });
     }
 
     public void createScene() {
         Toast.makeText(m_parent_activity,
                 "Add scene ...",
                 Toast.LENGTH_SHORT).show();
+
+        final Scene scene_to_be_created = new Scene();
+        scene_to_be_created.setName("New scene");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_activity);
+        LayoutInflater inflater = m_parent_activity.getLayoutInflater();
+
+        LinearLayout scene_card_view = (LinearLayout) inflater.inflate(R.layout.scene_layout, null);
+        final SceneViewHolder scene_view_holder = new SceneViewHolder(scene_card_view);
+        scene_view_holder.m_scene = scene_to_be_created;
+        scene_view_holder.setActualView();
+
+        LampsRecycleViewAdapter adapter = new LampsRecycleViewAdapter(scene_view_holder.m_scene.getDevices(),
+                m_parent_activity,
+                new LampsRecycleViewAdapter.SetLampListener() {
+                    @Override
+                    public void onLampSet(Lamp lamp) {
+                        lamp.setSwitched(!lamp.getSwitched());
+                        scene_view_holder.setActualView();
+                    }
+                });
+
+        scene_view_holder.m_recycler_view.setLayoutManager(new LinearLayoutManager(m_parent_activity.getBaseContext()));
+        scene_view_holder.m_recycler_view.setAdapter(adapter);
+        scene_view_holder.m_menu_image.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                final PopupMenu popup_menu = new PopupMenu(m_parent_activity,
+                        view);
+                MenuInflater inflate = popup_menu.getMenuInflater();
+                inflate.inflate(R.menu.create_scene_actvity_popup_menu, popup_menu.getMenu());
+
+                popup_menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        switch (item.getItemId()) {
+                            case R.id.menu_scene_create: {
+
+                                Toast.makeText(m_parent_activity,
+                                        "Creating scene ...",
+                                        Toast.LENGTH_SHORT).show();
+
+                                AppContext.getIotManager().createScene(scene_view_holder.m_scene,
+                                        new IotManager.CreateListener<Scene>() {
+                                            @Override
+                                            public void OnSuccess(Scene device) {
+                                                getAndUpdateScenesList();
+                                            }
+
+                                            @Override
+                                            public void OnFailure(Throwable t) {
+                                                Log.e(LOG_TAG, "Unable to create scene, reason:" + t.getMessage());
+                                            }
+
+                                            @Override
+                                            public void OnFailure(String error) {
+                                                Log.e(LOG_TAG, "Unable to create scene, reason:" + error);
+                                            }
+                                        });
+
+                                return true;
+                            }
+                            case R.id.menu_scene_create_activate: {
+
+                                Toast.makeText(m_parent_activity,
+                                        "Creating and activating scene ...",
+                                        Toast.LENGTH_SHORT).show();
+
+                                scene_view_holder.m_scene.setActivated(true);
+                                scene_view_holder.setActualView();
+
+                                AppContext.getIotManager().createScene(scene_view_holder.m_scene,
+                                        new IotManager.CreateListener<Scene>() {
+                                            @Override
+                                            public void OnSuccess(Scene device) {
+                                                getAndUpdateScenesList();
+                                            }
+
+                                            @Override
+                                            public void OnFailure(Throwable t) {
+                                                Log.e(LOG_TAG, "Unable to create scene, reason:" + t.getMessage());
+                                            }
+
+                                            @Override
+                                            public void OnFailure(String error) {
+                                                Log.e(LOG_TAG, "Unable to create scene, reason:" + error);
+                                            }
+                                        });
+
+                                return true;
+                            }
+                            case R.id.menu_scene_add_remove_elements: {
+                                modifyListDevices(scene_view_holder.m_scene,
+                                        new ModifyDeviceListListener() {
+                                            @Override
+                                            public void onModify() {
+                                                scene_view_holder.setActualView();
+                                            }
+                                        });
+                                return true;
+                            }
+                            default:
+                                return false;
+
+                        }
+                    }
+                });
+
+                popup_menu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+
+                    @Override
+                    public void onDismiss(PopupMenu menu) {
+                        Toast.makeText(m_parent_activity,
+                                "onDismiss",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                popup_menu.show();
+            }
+        });
+
+        builder.setView(scene_card_view)
+                .setTitle(R.string.save_scene_caption)
+                .setPositiveButton(R.string.save_scene_ok,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        })
+                .setNegativeButton(R.string.save_scene_cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                            }
+                        });
+        builder.create();
+        builder.show();
     }
 
-    public void modifyListDevices(final Scene scene) {
+    public void modifyListDevices(final Scene scene,
+                                  final ModifyDeviceListListener listener) {
         Toast.makeText(m_parent_activity,
                 "Add/remove elemnts in scene " + scene.getUuid(),
                 Toast.LENGTH_SHORT).show();
@@ -58,7 +226,6 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
             public void OnSuccess(final List<Lamp> lamps) {
 
                 List<String> device_names = new LinkedList();
-                List<Boolean> device_used_in_scene = new LinkedList();
                 boolean[] device_used_flags = new boolean[lamps.size()];
                 int device_index = 0;
 
@@ -94,8 +261,17 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                                 }).setPositiveButton(R.string.update_scene_ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        scene.setDevices(copy_of_devices_list);
+                        scene.getDevices().clear();
+                        scene.getDevices().addAll(copy_of_devices_list);
+
+                        Log.d(LOG_TAG, "Scene updated:" + scene.getUuid());
+                        for (Lamp lamp : scene.getDevices()) {
+                            Log.d(LOG_TAG, "Scene updated:" + scene.getName() + " lamp:" + lamp.getName());
+                        }
                         updateSceneList();
+                        if (listener != null) {
+                            listener.onModify();
+                        }
                     }
                 }).setNegativeButton(R.string.update_scene_cancel, new DialogInterface.OnClickListener() {
                     @Override
@@ -231,6 +407,19 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
             m_scene_name.setText(m_scene.getName());
             m_scene_uuid.setText(m_scene.getUuid());
             m_switch.setChecked(m_scene.getActivated());
+
+            final RecyclerView.Adapter adapter = m_recycler_view.getAdapter();
+
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+
+            m_scene_name.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
         }
     }
 
@@ -262,16 +451,14 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         sceneViewHolder.m_recycler_view.setLayoutManager(new LinearLayoutManager(m_parent_activity.getBaseContext()));
         sceneViewHolder.m_recycler_view.setAdapter(adapter);
 
-        sceneViewHolder.m_menu_image.setOnClickListener(new View.OnClickListener()
-
-        {
+        sceneViewHolder.m_menu_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 final PopupMenu popup_menu = new PopupMenu(m_parent_activity,
                         view);
                 MenuInflater inflate = popup_menu.getMenuInflater();
-                inflate.inflate(R.menu.scene_popup_menu, popup_menu.getMenu());
+                inflate.inflate(R.menu.scenes_activity_popup_menu, popup_menu.getMenu());
 
                 popup_menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -279,7 +466,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
                         switch (item.getItemId()) {
 
-                            case R.id.menu_scene_save: {
+                            case R.id.menu_scene_create: {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_activity);
                                 builder.setMessage(R.string.update_scene_caption)
                                         .setPositiveButton(R.string.update_scene_ok,
@@ -304,7 +491,8 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                                 return true;
                             }
                             case R.id.menu_scene_add_remove_elements: {
-                                modifyListDevices(sceneViewHolder.m_scene);
+                                modifyListDevices(sceneViewHolder.m_scene, null);
+
                                 return true;
                             }
                             case R.id.menu_scene_delete: {

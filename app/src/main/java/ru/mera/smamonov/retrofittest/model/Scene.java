@@ -19,7 +19,7 @@ public class Scene extends GenericDevice {
 
     @SerializedName("activated")
     @Expose
-    private Boolean activated;
+    private boolean activated;
 
     public List<Lamp> getDevices() {
         return devices;
@@ -29,15 +29,19 @@ public class Scene extends GenericDevice {
         this.devices = devices;
     }
 
-    public Boolean getActivated() {
+    public boolean getActivated() {
         return activated;
     }
 
-    public void setActivated(Boolean activated) {
+    public void setActivated(boolean activated) {
         this.activated = activated;
     }
 
     static int index = 0;
+
+    public Scene() {
+        this.devices = new LinkedList<>();
+    }
 
     public static Scene generate() {
         Scene result = new Scene();

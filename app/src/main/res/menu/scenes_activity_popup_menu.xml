@@ -6,7 +6,7 @@
         android:title="Activate" />
 
     <item
-        android:id="@+id/menu_scene_save"
+        android:id="@+id/menu_scene_create"
         android:title="Save" />
 
     <item

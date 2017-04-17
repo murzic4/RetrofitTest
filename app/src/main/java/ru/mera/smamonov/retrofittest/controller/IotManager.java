@@ -26,7 +26,7 @@ public class IotManager {
     }
 
     public interface GetListListener<DeviceType> extends FailureListener {
-        void OnSuccess(final List<DeviceType> lamps);
+        void OnSuccess(final List<DeviceType> devices);
     }
 
     public interface SetListener<DeviceType> extends FailureListener {

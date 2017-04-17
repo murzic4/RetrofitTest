@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_scene_create"
+        android:title="Save" />
+
+    <item
+        android:id="@+id/menu_scene_create_activate"
+        android:title="Save and activate" />
+
+    <item
+        android:id="@+id/menu_scene_add_remove_elements"
+        android:title="Add/remove elements" />
+
+</menu>

@@ -7,4 +7,7 @@
     <string name="delete_scene_caption">Remove scene?</string>
     <string name="delete_scene_ok">Delete</string>
     <string name="delete_scene_cancel">Cancel</string>
+    <string name="save_scene_caption">Save scene?</string>
+    <string name="save_scene_ok">Save</string>
+    <string name="save_scene_cancel">Cancel</string>
 </resources>
