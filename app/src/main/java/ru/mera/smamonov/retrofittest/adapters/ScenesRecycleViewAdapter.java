@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -111,29 +112,23 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     public boolean onMenuItemClick(MenuItem item) {
 
                         switch (item.getItemId()) {
+                            case R.id.menu_scene_rename: {
+
+                                Toast.makeText(m_parent_activity,
+                                        "Renaming scene ...",
+                                        Toast.LENGTH_SHORT).show();
+
+                                scene_view_holder.showRenameDialog();
+
+                                return true;
+                            }
                             case R.id.menu_scene_create: {
 
                                 Toast.makeText(m_parent_activity,
                                         "Creating scene ...",
                                         Toast.LENGTH_SHORT).show();
 
-                                AppContext.getIotManager().createScene(scene_view_holder.m_scene,
-                                        new IotManager.CreateListener<Scene>() {
-                                            @Override
-                                            public void OnSuccess(Scene device) {
-                                                getAndUpdateScenesList();
-                                            }
-
-                                            @Override
-                                            public void OnFailure(Throwable t) {
-                                                Log.e(LOG_TAG, "Unable to create scene, reason:" + t.getMessage());
-                                            }
-
-                                            @Override
-                                            public void OnFailure(String error) {
-                                                Log.e(LOG_TAG, "Unable to create scene, reason:" + error);
-                                            }
-                                        });
+                                createScene(scene_view_holder.m_scene);
 
                                 return true;
                             }
@@ -146,23 +141,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                                 scene_view_holder.m_scene.setActivated(true);
                                 scene_view_holder.setActualView();
 
-                                AppContext.getIotManager().createScene(scene_view_holder.m_scene,
-                                        new IotManager.CreateListener<Scene>() {
-                                            @Override
-                                            public void OnSuccess(Scene device) {
-                                                getAndUpdateScenesList();
-                                            }
-
-                                            @Override
-                                            public void OnFailure(Throwable t) {
-                                                Log.e(LOG_TAG, "Unable to create scene, reason:" + t.getMessage());
-                                            }
-
-                                            @Override
-                                            public void OnFailure(String error) {
-                                                Log.e(LOG_TAG, "Unable to create scene, reason:" + error);
-                                            }
-                                        });
+                                createScene(scene_view_holder.m_scene);
 
                                 return true;
                             }
@@ -198,14 +177,14 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         });
 
         builder.setView(scene_card_view)
-                .setTitle(R.string.save_scene_caption)
-                .setPositiveButton(R.string.save_scene_ok,
+                .setTitle(R.string.create_scene_caption)
+                .setPositiveButton(R.string.create_scene_ok,
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                             }
                         })
-                .setNegativeButton(R.string.save_scene_cancel,
+                .setNegativeButton(R.string.create_scene_cancel,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
 
@@ -218,7 +197,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public void modifyListDevices(final Scene scene,
                                   final ModifyDeviceListListener listener) {
         Toast.makeText(m_parent_activity,
-                "Add/remove elemnts in scene " + scene.getUuid(),
+                "Add/remove elements in scene " + scene.getUuid(),
                 Toast.LENGTH_SHORT).show();
 
         AppContext.getIotManager().getLamps(new IotManager.GetListListener<Lamp>() {
@@ -344,6 +323,26 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         saveScene(scene);
     }
 
+    void createScene(final Scene scene) {
+        AppContext.getIotManager().createScene(scene,
+                new IotManager.CreateListener<Scene>() {
+                    @Override
+                    public void OnSuccess(Scene device) {
+                        getAndUpdateScenesList();
+                    }
+
+                    @Override
+                    public void OnFailure(Throwable t) {
+                        Log.e(LOG_TAG, "Unable to create scene, reason:" + t.getMessage());
+                    }
+
+                    @Override
+                    public void OnFailure(String error) {
+                        Log.e(LOG_TAG, "Unable to create scene, reason:" + error);
+                    }
+                });
+    }
+
     void deleteScene(final Scene scene) {
         Toast.makeText(m_parent_activity,
                 "Deleting scene " + scene.getUuid() + " ...",
@@ -403,6 +402,35 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
             m_menu_image = (ImageButton) itemView.findViewById(R.id.scene_popup_menu);
         }
 
+        void showRenameDialog() {
+            final EditText input = new EditText(m_parent_activity);
+            input.setText(m_scene.getName());
+
+            LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+            input.setLayoutParams(layout);
+            AlertDialog.Builder dialog_builder = new AlertDialog.Builder(m_parent_activity);
+            dialog_builder.setView(input)
+                    .setTitle(R.string.rename_scene_caption)
+                    .setPositiveButton(R.string.rename_scene_ok,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    m_scene.setName(input.getText().toString());
+                                    setActualView();
+                                }
+                            })
+                    .setNegativeButton(R.string.rename_scene_cancel,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+
+                                }
+                            });
+            dialog_builder.create();
+            dialog_builder.show();
+        }
+
         void setActualView() {
             m_scene_name.setText(m_scene.getName());
             m_scene_uuid.setText(m_scene.getUuid());
@@ -413,13 +441,6 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }
-
-            m_scene_name.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
         }
     }
 
@@ -465,7 +486,10 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     public boolean onMenuItemClick(MenuItem item) {
 
                         switch (item.getItemId()) {
-
+                            case R.id.menu_scene_rename: {
+                                sceneViewHolder.showRenameDialog();
+                                return true;
+                            }
                             case R.id.menu_scene_create: {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_activity);
                                 builder.setMessage(R.string.update_scene_caption)

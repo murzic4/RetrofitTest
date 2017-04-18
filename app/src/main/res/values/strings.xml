@@ -1,13 +1,16 @@
 <resources>
     <string name="app_name">Smart home application</string>
     <string name="title_activity_scenes">Scenes</string>
-    <string name="update_scene_caption">Save scene changes</string>
+    <string name="update_scene_caption">Save scene changes?</string>
     <string name="update_scene_ok">Save</string>
     <string name="update_scene_cancel">Cancel</string>
     <string name="delete_scene_caption">Remove scene?</string>
     <string name="delete_scene_ok">Delete</string>
     <string name="delete_scene_cancel">Cancel</string>
-    <string name="save_scene_caption">Save scene?</string>
-    <string name="save_scene_ok">Save</string>
-    <string name="save_scene_cancel">Cancel</string>
+    <string name="create_scene_caption">Create scene?</string>
+    <string name="create_scene_ok">Create</string>
+    <string name="create_scene_cancel">Cancel</string>
+    <string name="rename_scene_caption">Rename scene?</string>
+    <string name="rename_scene_ok">Rename</string>
+    <string name="rename_scene_cancel">Cancel</string>
 </resources>

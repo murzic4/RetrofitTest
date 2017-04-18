@@ -6,6 +6,10 @@
         android:title="Activate" />
 
     <item
+        android:id="@+id/menu_scene_rename"
+        android:title="Rename" />
+
+    <item
         android:id="@+id/menu_scene_create"
         android:title="Save" />
 
