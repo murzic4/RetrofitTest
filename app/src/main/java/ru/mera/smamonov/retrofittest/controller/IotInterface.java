@@ -37,21 +37,21 @@ public interface IotInterface {
     /*************************************************************************************
      * Scenes
      *************************************************************************************/
-    @GET("scences/")
+    @GET("scenes/")
     Call<List<Scene>> getSceneList();
 
-    @GET("scences/{scence_id}")
-    Call<Scene> getScene(@Path("scence_id") String scence_id);
+    @GET("scenes/{scene_id}")
+    Call<Scene> getScene(@Path("scene_id") String device_id);
 
-    @PUT("scences/{scence_id}")
-    Call<ApiResponse> setScene(@Path("scence_id") String scence_id,
+    @PUT("scenes/{scene_id}")
+    Call<ApiResponse> setScene(@Path("scene_id") String device_id,
                                @Body Scene scence);
 
-    @POST("scences/")
+    @POST("scenes/")
     Call<ApiResponse> createScene(@Body Scene device);
 
-    @DELETE("scences/{scence_id}")
-    Call<ApiResponse> deleteScene(@Path("scence_id") String device_id);
+    @DELETE("scenes/{scene_id}")
+    Call<ApiResponse> deleteScene(@Path("scene_id") String device_id);
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://192.168.56.1:8080/")
