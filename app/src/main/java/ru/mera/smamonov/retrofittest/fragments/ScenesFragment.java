@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import ru.mera.smamonov.retrofittest.R;
@@ -86,14 +85,15 @@ public class ScenesFragment extends Fragment {
             public void OnFailure(Throwable t) {
                 Log.e(LOG_TAG, t.getMessage());
 
-                List<Scene> my_devices = new LinkedList<Scene>();
-
-                for (int index = 0; index < 10; index++) {
-                    my_devices.add(Scene.generate());
-                }
-                ScenesRecycleViewAdapter adapter = new ScenesRecycleViewAdapter(my_devices, getContext());
-                m_recycler_view.setAdapter(adapter);
-                fab.setVisibility(View.VISIBLE);
+                //TODO: remove this
+//                List<Scene> my_devices = new LinkedList<Scene>();
+//
+//                for (int index = 0; index < 10; index++) {
+//                    my_devices.add(Scene.generate());
+//                }
+//                ScenesRecycleViewAdapter adapter = new ScenesRecycleViewAdapter(my_devices, getContext());
+//                m_recycler_view.setAdapter(adapter);
+//                fab.setVisibility(View.VISIBLE);
             }
 
             @Override

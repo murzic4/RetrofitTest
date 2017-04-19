@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -79,10 +80,6 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         scene_to_be_created.setName("New scene");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_context);
-        /*
-        m_parent_context
-        LayoutInflater inflater = m_parent_context.getLayoutInflater();
-*/
         LayoutInflater inflater = LayoutInflater.from(m_parent_context);
 
         LinearLayout scene_card_view = (LinearLayout) inflater.inflate(R.layout.scene_layout, null);
@@ -99,6 +96,24 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                         scene_view_holder.setActualView();
                     }
                 });
+
+        builder.setView(scene_card_view)
+                .setTitle(R.string.create_scene_caption)
+                .setPositiveButton(R.string.create_scene_ok,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                createScene(scene_view_holder.m_scene);
+                            }
+                        })
+                .setNegativeButton(R.string.create_scene_cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                            }
+                        });
+        builder.create();
+        final AlertDialog create_dialog = builder.show();
 
         scene_view_holder.m_recycler_view.setLayoutManager(new LinearLayoutManager(m_parent_context));
         scene_view_holder.m_recycler_view.setAdapter(adapter);
@@ -133,7 +148,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                                         Toast.LENGTH_SHORT).show();
 
                                 createScene(scene_view_holder.m_scene);
-
+                                create_dialog.dismiss();
                                 return true;
                             }
                             case R.id.menu_scene_create_activate: {
@@ -146,6 +161,8 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                                 scene_view_holder.setActualView();
 
                                 createScene(scene_view_holder.m_scene);
+
+                                create_dialog.dismiss();
 
                                 return true;
                             }
@@ -179,24 +196,6 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 popup_menu.show();
             }
         });
-
-        builder.setView(scene_card_view)
-                .setTitle(R.string.create_scene_caption)
-                .setPositiveButton(R.string.create_scene_ok,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                createScene(scene_view_holder.m_scene);
-                            }
-                        })
-                .setNegativeButton(R.string.create_scene_cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-
-                            }
-                        });
-        builder.create();
-        builder.show();
     }
 
     public void modifyListDevices(final Scene scene,
@@ -333,6 +332,8 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 new IotManager.CreateListener<Scene>() {
                     @Override
                     public void OnSuccess(Scene device) {
+
+
                         getAndUpdateScenesList();
                     }
 
@@ -446,6 +447,14 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }
+
+            m_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    Log.d(LOG_TAG, "Set scene:" + m_scene.getUuid() + " activated:" + isChecked);
+                    m_scene.setActivated(isChecked);
+                }
+            });
         }
     }
 

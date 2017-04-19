@@ -298,19 +298,20 @@ public class IotManager {
 
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                Log.e("Error", "onResponse: " + String.valueOf(response.isSuccessful()));
 
                 if (m_listener != null) {
                     ApiResponse apiResponse = response.body();
 
-                    Log.d(LOG_TAG, "apiResponse code: " + apiResponse.getCode());
-                    Log.d(LOG_TAG, "apiResponse message: " + apiResponse.getMessage());
-
                     if (response.isSuccessful() &&
+                            apiResponse != null &&
                             apiResponse.getCode() == ApiResponse.RESULT_OK) {
+
+                        Log.d(LOG_TAG, "apiResponse code: " + apiResponse.getCode());
+                        Log.d(LOG_TAG, "apiResponse message: " + apiResponse.getMessage());
+
                         m_listener.OnSuccess(device);
                     } else {
-                        m_listener.OnFailure(apiResponse.getMessage());
+                        m_listener.OnFailure(apiResponse == null ? "No data" : apiResponse.getMessage());
                     }
                 }
             }
