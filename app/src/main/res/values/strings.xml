@@ -13,4 +13,16 @@
     <string name="rename_scene_caption">Rename scene?</string>
     <string name="rename_scene_ok">Rename</string>
     <string name="rename_scene_cancel">Cancel</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="Settings_caption">Settings</string>
+    <string name="settings_url">HG http server url</string>
+    <string name="title_configuration">Configuration</string>
+    <string name="apply_configuration_button">Save configuration</string>
+    <string name="settings_file_name">settings</string>
+    <string name="title_update_configuration">Restart needed for apply configuration</string>
+    <string name="restart">Restart</string>
+    <string name="restart_cancel">Cancel</string>
+    <string name="default_url">"http://192.168.56.1:8080/"</string>
 </resources>

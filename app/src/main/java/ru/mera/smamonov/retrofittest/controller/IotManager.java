@@ -7,17 +7,21 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import ru.mera.smamonov.retrofittest.R;
+import ru.mera.smamonov.retrofittest.context.AppContext;
 import ru.mera.smamonov.retrofittest.model.ApiResponse;
 import ru.mera.smamonov.retrofittest.model.Lamp;
 import ru.mera.smamonov.retrofittest.model.Scene;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by sergeym on 31.03.2017.
  */
 
 public class IotManager {
-
-    private final String LOG_TAG = "IotManager";
 
     public interface FailureListener {
         void OnFailure(Throwable t);
@@ -46,9 +50,23 @@ public class IotManager {
     }
 
     private IotInterface m_interface = null;
+    private final String LOG_TAG = "IotManager";
+    private static Retrofit m_retrofit = null;
 
     public IotManager() {
-        m_interface = IotInterface.retrofit.create(IotInterface.class);
+        String url = AppContext.getAppContext().getSharedPreferences(AppContext.getAppContext().getResources().getString(R.string.settings_file_name),
+                MODE_PRIVATE).getString("url", AppContext.getAppContext().getString(R.string.default_url));
+
+        configureRetrofit(url);
+    }
+
+    public void configureRetrofit(String url) {
+        m_retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        m_interface = m_retrofit.create(IotInterface.class);
     }
 
     public void getLamps(final GetListListener<Lamp> getLampsListener) {

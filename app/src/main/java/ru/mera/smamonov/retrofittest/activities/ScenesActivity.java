@@ -21,12 +21,12 @@ public class ScenesActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "ScenesActivity";
 
-    RecyclerView m_recycler_view = null;
+    RecyclerView m_lamps_recycler_view = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scenes);
+        setContentView(R.layout.scenes_fragment);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -35,7 +35,7 @@ public class ScenesActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ScenesRecycleViewAdapter adapter = (ScenesRecycleViewAdapter) m_recycler_view.getAdapter();
+                ScenesRecycleViewAdapter adapter = (ScenesRecycleViewAdapter) m_lamps_recycler_view.getAdapter();
                 if (adapter != null) {
                     adapter.createScene();
                 }
@@ -43,10 +43,10 @@ public class ScenesActivity extends AppCompatActivity {
         });
 
         IotManager iotManager = new IotManager();
-        m_recycler_view = (RecyclerView) findViewById(R.id.RecycleViewSceneActivity);
+        m_lamps_recycler_view = (RecyclerView) findViewById(R.id.RecycleViewSceneActivity);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getBaseContext());
 
-        m_recycler_view.setLayoutManager(linearLayoutManager);
+        m_lamps_recycler_view.setLayoutManager(linearLayoutManager);
 
         final ScenesActivity scenesActivity = this;
 
@@ -54,7 +54,7 @@ public class ScenesActivity extends AppCompatActivity {
             @Override
             public void OnSuccess(List<Scene> devices) {
                 ScenesRecycleViewAdapter adapter = new ScenesRecycleViewAdapter(devices, scenesActivity);
-                m_recycler_view.setAdapter(adapter);
+                m_lamps_recycler_view.setAdapter(adapter);
                 fab.setVisibility(View.VISIBLE);
             }
 
@@ -68,7 +68,7 @@ public class ScenesActivity extends AppCompatActivity {
                     my_devices.add(Scene.generate());
                 }
                 ScenesRecycleViewAdapter adapter = new ScenesRecycleViewAdapter(my_devices, scenesActivity);
-                m_recycler_view.setAdapter(adapter);
+                m_lamps_recycler_view.setAdapter(adapter);
                 fab.setVisibility(View.VISIBLE);
             }
 

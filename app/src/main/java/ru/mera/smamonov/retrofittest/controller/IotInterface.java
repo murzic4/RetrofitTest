@@ -3,8 +3,6 @@ package ru.mera.smamonov.retrofittest.controller;
 import java.util.List;
 
 import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -52,11 +50,14 @@ public interface IotInterface {
 
     @DELETE("scenes/{scene_id}")
     Call<ApiResponse> deleteScene(@Path("scene_id") String device_id);
-
+/*
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://192.168.56.1:8080/")
+            //.baseUrl("http://192.168.56.1:8080/")
+            .baseUrl(AppContext.getAppContext().getSharedPreferences(AppContext.getAppContext().getResources().getString(R.string.settings_file_name),
+                    MODE_PRIVATE).getString("url", "http://192.168.56.1:8080/"))
             .addConverterFactory(GsonConverterFactory.create())
             .build();
+            */
 }
 
 

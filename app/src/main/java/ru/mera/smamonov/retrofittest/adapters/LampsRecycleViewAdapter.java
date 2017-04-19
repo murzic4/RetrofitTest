@@ -1,6 +1,6 @@
 package ru.mera.smamonov.retrofittest.adapters;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -42,7 +42,7 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         Log.d(LOG_TAG, "Saving lamp " + lamp.getUuid() + " ...");
 
-        Toast.makeText(m_parent_activity,
+        Toast.makeText(m_parent_context,
                 "Saving lamp " + lamp.getUuid(),
                 Toast.LENGTH_SHORT).show();
 
@@ -73,7 +73,8 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     private List<Lamp> m_lamps = null;
-    private AppCompatActivity m_parent_activity = null;
+    //private AppCompatActivity m_parent_activity = null;
+    private Context m_parent_context = null;
     private SetLampListener m_lamp_set_listener = null;
 
     public class LampViewHolder extends RecyclerView.ViewHolder {
@@ -113,10 +114,12 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public LampsRecycleViewAdapter(List<Lamp> lamps,
-                                   final AppCompatActivity parent_activity,
+                                   /*final AppCompatActivity parent_activity,*/
+                                   final Context context,
                                    final SetLampListener set_lamp_listener) {
         this.m_lamps = lamps;
-        this.m_parent_activity = parent_activity;
+        //this.m_parent_activity = parent_activity;
+        this.m_parent_context = context;
         this.m_lamp_set_listener = set_lamp_listener;
     }
 

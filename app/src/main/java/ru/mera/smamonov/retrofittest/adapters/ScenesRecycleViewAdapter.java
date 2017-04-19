@@ -1,5 +1,6 @@
 package ru.mera.smamonov.retrofittest.adapters;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
@@ -23,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ru.mera.smamonov.retrofittest.R;
-import ru.mera.smamonov.retrofittest.activities.ScenesActivity;
 import ru.mera.smamonov.retrofittest.context.AppContext;
 import ru.mera.smamonov.retrofittest.controller.IotManager;
 import ru.mera.smamonov.retrofittest.model.GenericDevice;
@@ -38,7 +38,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     static private final String LOG_TAG = "ScenesAdapter";
     private List<Scene> m_scenes = null;
-    private ScenesActivity m_parent_activity = null;
+    private Context m_parent_context = null;
 
     private interface ModifyDeviceListListener {
         void onModify();
@@ -71,15 +71,19 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     public void createScene() {
-        Toast.makeText(m_parent_activity,
+        Toast.makeText(m_parent_context,
                 "Add scene ...",
                 Toast.LENGTH_SHORT).show();
 
         final Scene scene_to_be_created = new Scene();
         scene_to_be_created.setName("New scene");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_activity);
-        LayoutInflater inflater = m_parent_activity.getLayoutInflater();
+        AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_context);
+        /*
+        m_parent_context
+        LayoutInflater inflater = m_parent_context.getLayoutInflater();
+*/
+        LayoutInflater inflater = LayoutInflater.from(m_parent_context);
 
         LinearLayout scene_card_view = (LinearLayout) inflater.inflate(R.layout.scene_layout, null);
         final SceneViewHolder scene_view_holder = new SceneViewHolder(scene_card_view);
@@ -87,7 +91,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         scene_view_holder.setActualView();
 
         LampsRecycleViewAdapter adapter = new LampsRecycleViewAdapter(scene_view_holder.m_scene.getDevices(),
-                m_parent_activity,
+                m_parent_context,
                 new LampsRecycleViewAdapter.SetLampListener() {
                     @Override
                     public void onLampSet(Lamp lamp) {
@@ -96,13 +100,13 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     }
                 });
 
-        scene_view_holder.m_recycler_view.setLayoutManager(new LinearLayoutManager(m_parent_activity.getBaseContext()));
+        scene_view_holder.m_recycler_view.setLayoutManager(new LinearLayoutManager(m_parent_context));
         scene_view_holder.m_recycler_view.setAdapter(adapter);
         scene_view_holder.m_menu_image.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                final PopupMenu popup_menu = new PopupMenu(m_parent_activity,
+                final PopupMenu popup_menu = new PopupMenu(m_parent_context,
                         view);
                 MenuInflater inflate = popup_menu.getMenuInflater();
                 inflate.inflate(R.menu.create_scene_actvity_popup_menu, popup_menu.getMenu());
@@ -114,7 +118,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                         switch (item.getItemId()) {
                             case R.id.menu_scene_rename: {
 
-                                Toast.makeText(m_parent_activity,
+                                Toast.makeText(m_parent_context,
                                         "Renaming scene ...",
                                         Toast.LENGTH_SHORT).show();
 
@@ -124,7 +128,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                             }
                             case R.id.menu_scene_create: {
 
-                                Toast.makeText(m_parent_activity,
+                                Toast.makeText(m_parent_context,
                                         "Creating scene ...",
                                         Toast.LENGTH_SHORT).show();
 
@@ -134,7 +138,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                             }
                             case R.id.menu_scene_create_activate: {
 
-                                Toast.makeText(m_parent_activity,
+                                Toast.makeText(m_parent_context,
                                         "Creating and activating scene ...",
                                         Toast.LENGTH_SHORT).show();
 
@@ -166,7 +170,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
                     @Override
                     public void onDismiss(PopupMenu menu) {
-                        Toast.makeText(m_parent_activity,
+                        Toast.makeText(m_parent_context,
                                 "onDismiss",
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -182,6 +186,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
+                                createScene(scene_view_holder.m_scene);
                             }
                         })
                 .setNegativeButton(R.string.create_scene_cancel,
@@ -196,7 +201,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     public void modifyListDevices(final Scene scene,
                                   final ModifyDeviceListListener listener) {
-        Toast.makeText(m_parent_activity,
+        Toast.makeText(m_parent_context,
                 "Add/remove elements in scene " + scene.getUuid(),
                 Toast.LENGTH_SHORT).show();
 
@@ -217,7 +222,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 final CharSequence[] names_array = device_names.toArray(new CharSequence[device_names.size()]);
                 final List<Lamp> copy_of_devices_list = new LinkedList<Lamp>(scene.getDevices());
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_activity);
+                AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_context);
                 builder.setTitle("Title")
                         .setMultiChoiceItems(names_array,
                                 device_used_flags,
@@ -282,7 +287,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
         Log.d(LOG_TAG, "Saving scene " + scene.getUuid() + " ...");
 
-        Toast.makeText(m_parent_activity,
+        Toast.makeText(m_parent_context,
                 "Saving scene " + scene.getUuid(),
                 Toast.LENGTH_SHORT).show();
 
@@ -314,7 +319,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
         Log.d(LOG_TAG, "Activate scene " + scene.getUuid() + " ...");
 
-        Toast.makeText(m_parent_activity,
+        Toast.makeText(m_parent_context,
                 "Activating scene " + scene.getUuid(),
                 Toast.LENGTH_SHORT).show();
 
@@ -344,7 +349,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     void deleteScene(final Scene scene) {
-        Toast.makeText(m_parent_activity,
+        Toast.makeText(m_parent_context,
                 "Deleting scene " + scene.getUuid() + " ...",
                 Toast.LENGTH_SHORT).show();
 
@@ -352,7 +357,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 new IotManager.DeleteListener<Scene>() {
                     @Override
                     public void OnSuccess(Scene device) {
-                        Toast.makeText(m_parent_activity,
+                        Toast.makeText(m_parent_context,
                                 "Scene " + scene.getUuid() + " was successfully removed",
                                 Toast.LENGTH_SHORT).show();
                         m_scenes.remove(scene);
@@ -361,7 +366,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
                     @Override
                     public void OnFailure(Throwable t) {
-                        Toast.makeText(m_parent_activity,
+                        Toast.makeText(m_parent_context,
                                 "Unable to delete Scene " + scene.getUuid() + ", reason: " + t.getMessage(),
                                 Toast.LENGTH_SHORT).show();
                         //TODO: remove this in release
@@ -371,7 +376,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
                     @Override
                     public void OnFailure(String error) {
-                        Toast.makeText(m_parent_activity,
+                        Toast.makeText(m_parent_context,
                                 "Unable to delete Scene " + scene.getUuid() + ", reason: " + error,
                                 Toast.LENGTH_SHORT).show();
                         //TODO: remove this in release
@@ -403,14 +408,14 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         }
 
         void showRenameDialog() {
-            final EditText input = new EditText(m_parent_activity);
+            final EditText input = new EditText(m_parent_context);
             input.setText(m_scene.getName());
 
             LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.MATCH_PARENT);
             input.setLayoutParams(layout);
-            AlertDialog.Builder dialog_builder = new AlertDialog.Builder(m_parent_activity);
+            AlertDialog.Builder dialog_builder = new AlertDialog.Builder(m_parent_context);
             dialog_builder.setView(input)
                     .setTitle(R.string.rename_scene_caption)
                     .setPositiveButton(R.string.rename_scene_ok,
@@ -445,9 +450,9 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     public ScenesRecycleViewAdapter(List<Scene> scenes,
-                                    final ScenesActivity parent_activity) {
+                                    final Context parent_context) {
         this.m_scenes = scenes;
-        this.m_parent_activity = parent_activity;
+        this.m_parent_context = parent_context;
     }
 
     @Override
@@ -459,24 +464,23 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         sceneViewHolder.setActualView();
 
         LampsRecycleViewAdapter adapter = new LampsRecycleViewAdapter(scene.getDevices(),
-                m_parent_activity,
+                m_parent_context,
                 new LampsRecycleViewAdapter.SetLampListener() {
                     @Override
                     public void onLampSet(Lamp lamp) {
                         lamp.setSwitched(!lamp.getSwitched());
-                        //sceneViewHolder.setActualView();
                         updateSceneList();
                     }
                 });
 
-        sceneViewHolder.m_recycler_view.setLayoutManager(new LinearLayoutManager(m_parent_activity.getBaseContext()));
+        sceneViewHolder.m_recycler_view.setLayoutManager(new LinearLayoutManager(m_parent_context));
         sceneViewHolder.m_recycler_view.setAdapter(adapter);
 
         sceneViewHolder.m_menu_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                final PopupMenu popup_menu = new PopupMenu(m_parent_activity,
+                final PopupMenu popup_menu = new PopupMenu(m_parent_context,
                         view);
                 MenuInflater inflate = popup_menu.getMenuInflater();
                 inflate.inflate(R.menu.scenes_activity_popup_menu, popup_menu.getMenu());
@@ -491,7 +495,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                                 return true;
                             }
                             case R.id.menu_scene_create: {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_activity);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_context);
                                 builder.setMessage(R.string.update_scene_caption)
                                         .setPositiveButton(R.string.update_scene_ok,
                                                 new DialogInterface.OnClickListener() {
@@ -520,7 +524,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                                 return true;
                             }
                             case R.id.menu_scene_delete: {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_activity);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_context);
                                 builder.setMessage(R.string.delete_scene_caption)
                                         .setPositiveButton(R.string.delete_scene_ok,
                                                 new DialogInterface.OnClickListener() {
@@ -531,7 +535,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                                         .setNegativeButton(R.string.delete_scene_cancel,
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int id) {
-                                                        Toast.makeText(m_parent_activity,
+                                                        Toast.makeText(m_parent_context,
                                                                 "Deleting scene " + sceneViewHolder.m_scene.getUuid() + " cancelled",
                                                                 Toast.LENGTH_SHORT).show();
                                                     }
@@ -553,7 +557,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
                     @Override
                     public void onDismiss(PopupMenu menu) {
-                        Toast.makeText(m_parent_activity,
+                        Toast.makeText(m_parent_context,
                                 "onDismiss",
                                 Toast.LENGTH_SHORT).show();
                     }
