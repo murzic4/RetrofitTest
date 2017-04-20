@@ -6,12 +6,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import ru.mera.smamonov.retrofittest.R;
 import ru.mera.smamonov.retrofittest.fragments.ConfigurationFragment;
+import ru.mera.smamonov.retrofittest.fragments.GenericFragment;
 import ru.mera.smamonov.retrofittest.fragments.LampsFragment;
 import ru.mera.smamonov.retrofittest.fragments.ScenesFragment;
 
@@ -38,67 +40,49 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-/*
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        */
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mSectionsPagerAdapter.addFragment(LampsFragment.newInstance(), "Lamps");
         mSectionsPagerAdapter.addFragment(ScenesFragment.newInstance(), "Scenes");
         mSectionsPagerAdapter.addFragment(ConfigurationFragment.newInstance(), "Configuration");
 
-        // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setOffscreenPageLimit(1);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-/*
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onPageScrolled(int i, float v, int i1) {
+                //Log.e(LOG_TAG, "onPageScrolled i:" + i + ", v:" + v + ", i1:" + i1);
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                Log.e(LOG_TAG, "onPageSelected i:" + i);
+
+                GenericFragment fragment = (GenericFragment) mSectionsPagerAdapter.getItem(i);
+                if (fragment != null) {
+                    fragment.updateView();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+//                Log.e(LOG_TAG, "onPageScrollStateChanged i:" + i);
             }
         });
-        */
-
     }
 
-    /*
-        @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-            // Inflate the menu; this adds items to the action bar if it is present.
-            getMenuInflater().inflate(R.menu.menu_main, menu);
-            return true;
-        }
-    */
-    /*
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-*/
     /**
      * A placeholder fragment containing a simple view.
      */
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        List<Fragment> m_fragments = new LinkedList<>();
+        List<GenericFragment> m_fragments = new LinkedList<>();
         List<String> m_fragments_names = new LinkedList<>();
 
-        public void addFragment(Fragment fragment, String caption) {
+        public void addFragment(GenericFragment fragment, String caption) {
             m_fragments.add(fragment);
             m_fragments_names.add(caption);
         }
@@ -123,9 +107,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-        Log.e(LOG_TAG, uri.toString());
-    }*/
 }

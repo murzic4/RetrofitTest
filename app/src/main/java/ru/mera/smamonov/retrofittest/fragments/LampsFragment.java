@@ -3,7 +3,6 @@ package ru.mera.smamonov.retrofittest.fragments;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +22,7 @@ import ru.mera.smamonov.retrofittest.context.AppContext;
 import ru.mera.smamonov.retrofittest.controller.IotManager;
 import ru.mera.smamonov.retrofittest.model.Lamp;
 
-public class LampsFragment extends Fragment {
+public class LampsFragment extends GenericFragment {
 
     private static final String LOG_TAG = "LampsFragment";
 
@@ -44,22 +43,13 @@ public class LampsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.e(LOG_TAG, "onCreate");
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        View rootView = inflater.inflate(R.layout.lamps_fragment, container, false);
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        toolbar.setTitle("Lamps");
-
-        m_lamps_view = (RecyclerView) rootView.findViewById(R.id.recycle_view_lamps);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        m_lamps_view.setLayoutManager(linearLayoutManager);
+    public void updateView() {
+        Log.e(LOG_TAG, "updateView");
 
         AppContext.getIotManager().getLamps(new IotManager.GetListListener<Lamp>() {
 
@@ -101,6 +91,62 @@ public class LampsFragment extends Fragment {
                 }
             }
         });
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
+        Log.e(LOG_TAG, "onCreateView");
+
+        View rootView = inflater.inflate(R.layout.lamps_fragment, container, false);
+        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        toolbar.setTitle("Lamps");
+
+        m_lamps_view = (RecyclerView) rootView.findViewById(R.id.recycle_view_lamps);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        m_lamps_view.setLayoutManager(linearLayoutManager);
+
+        updateView();
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.e(LOG_TAG, "onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.e(LOG_TAG, "onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.e(LOG_TAG, "onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.e(LOG_TAG, "onStop");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e(LOG_TAG, "onDestroy");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.e(LOG_TAG, "onDetach");
     }
 }

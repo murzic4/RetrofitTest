@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,8 +26,9 @@ import static android.content.Context.MODE_PRIVATE;
  * Use the {@link ConfigurationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ConfigurationFragment extends Fragment {
+public class ConfigurationFragment extends GenericFragment {
 
+    static final String LOG_TAG = "ConfigurationFragment";
     public ConfigurationFragment() {
         // Required empty public constructor
     }
@@ -41,8 +43,6 @@ public class ConfigurationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
     }
 
     @Override
@@ -98,4 +98,8 @@ public class ConfigurationFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void updateView() {
+        Log.e(LOG_TAG, "updateView");
+    }
 }
