@@ -2,6 +2,7 @@ package ru.mera.smamonov.retrofittest.adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -53,7 +54,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
         AppContext.getIotManager().getScenes(new IotManager.GetListListener<Scene>() {
             @Override
             public void OnSuccess(List<Scene> devices) {
-                Log.e(LOG_TAG, "Obtaining list of scenes");
+                Log.e(LOG_TAG, "Obtaining list of scenes...");
                 m_scenes.clear();
                 m_scenes.addAll(devices);
                 notifyDataSetChanged();
@@ -132,21 +133,10 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
                         switch (item.getItemId()) {
                             case R.id.menu_scene_rename: {
-
-                                Toast.makeText(m_parent_context,
-                                        "Renaming scene ...",
-                                        Toast.LENGTH_SHORT).show();
-
                                 scene_view_holder.showRenameDialog();
-
                                 return true;
                             }
                             case R.id.menu_scene_create: {
-
-                                Toast.makeText(m_parent_context,
-                                        "Creating scene ...",
-                                        Toast.LENGTH_SHORT).show();
-
                                 createScene(scene_view_holder.m_scene);
                                 create_dialog.dismiss();
                                 return true;
@@ -187,9 +177,9 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
                     @Override
                     public void onDismiss(PopupMenu menu) {
-                        Toast.makeText(m_parent_context,
-                                "onDismiss",
-                                Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(m_parent_context,
+//                                "onDismiss",
+//                                Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -200,9 +190,9 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     public void modifyListDevices(final Scene scene,
                                   final ModifyDeviceListListener listener) {
-        Toast.makeText(m_parent_context,
-                "Add/remove elements in scene " + scene.getUuid(),
-                Toast.LENGTH_SHORT).show();
+//        Toast.makeText(m_parent_context,
+//                "Add/remove elements in scene " + scene.getUuid(),
+//                Toast.LENGTH_SHORT).show();
 
         AppContext.getIotManager().getLamps(new IotManager.GetListListener<Lamp>() {
             @Override
@@ -222,7 +212,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 final List<Lamp> copy_of_devices_list = new LinkedList<Lamp>(scene.getDevices());
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(m_parent_context);
-                builder.setTitle("Title")
+                builder.setTitle(R.string.add_remove_devices_for_scene)
                         .setMultiChoiceItems(names_array,
                                 device_used_flags,
                                 new DialogInterface.OnMultiChoiceClickListener() {
@@ -230,7 +220,6 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                                     public void onClick(DialogInterface dialog,
                                                         int which,
                                                         boolean isChecked) {
-
                                         Lamp lamp = lamps.get(which);
 
                                         if (isChecked) {
@@ -328,28 +317,47 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     void createScene(final Scene scene) {
+
+        Toast.makeText(m_parent_context,
+                "Creating scene ...",
+                Toast.LENGTH_SHORT).show();
+
         AppContext.getIotManager().createScene(scene,
                 new IotManager.CreateListener<Scene>() {
                     @Override
                     public void OnSuccess(Scene device) {
-
-
+                        Toast.makeText(m_parent_context,
+                                "Scene was successfully created",
+                                Toast.LENGTH_SHORT).show();
                         getAndUpdateScenesList();
                     }
 
                     @Override
                     public void OnFailure(Throwable t) {
                         Log.e(LOG_TAG, "Unable to create scene, reason:" + t.getMessage());
+                        Toast toast = Toast.makeText(m_parent_context,
+                                "Unable to create scene, reason:" + t.getMessage(),
+                                Toast.LENGTH_SHORT);
+                        TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                        text_view.setTextColor(Color.RED);
+                        toast.show();
                     }
 
                     @Override
                     public void OnFailure(String error) {
                         Log.e(LOG_TAG, "Unable to create scene, reason:" + error);
+                        Toast toast = Toast.makeText(m_parent_context,
+                                "Unable to create scene, reason:" + error,
+                                Toast.LENGTH_SHORT);
+                        TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                        text_view.setTextColor(Color.RED);
+                        toast.show();
                     }
                 });
     }
 
     void deleteScene(final Scene scene) {
+
         Toast.makeText(m_parent_context,
                 "Deleting scene " + scene.getUuid() + " ...",
                 Toast.LENGTH_SHORT).show();
@@ -367,20 +375,26 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
                     @Override
                     public void OnFailure(Throwable t) {
-                        Toast.makeText(m_parent_context,
+                        Toast toast = Toast.makeText(m_parent_context,
                                 "Unable to delete Scene " + scene.getUuid() + ", reason: " + t.getMessage(),
-                                Toast.LENGTH_SHORT).show();
-                        //TODO: remove this in release
+                                Toast.LENGTH_SHORT);
+                        TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                        text_view.setTextColor(Color.RED);
+                        toast.show();
+
                         m_scenes.remove(scene);
                         updateSceneList();
                     }
 
                     @Override
                     public void OnFailure(String error) {
-                        Toast.makeText(m_parent_context,
+                        Toast toast = Toast.makeText(m_parent_context,
                                 "Unable to delete Scene " + scene.getUuid() + ", reason: " + error,
-                                Toast.LENGTH_SHORT).show();
-                        //TODO: remove this in release
+                                Toast.LENGTH_SHORT);
+                        TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                        text_view.setTextColor(Color.RED);
+                        toast.show();
+
                         m_scenes.remove(scene);
                         updateSceneList();
                     }
@@ -563,12 +577,9 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 });
 
                 popup_menu.setOnDismissListener(new PopupMenu.OnDismissListener() {
-
                     @Override
                     public void onDismiss(PopupMenu menu) {
-                        Toast.makeText(m_parent_context,
-                                "onDismiss",
-                                Toast.LENGTH_SHORT).show();
+
                     }
                 });
 

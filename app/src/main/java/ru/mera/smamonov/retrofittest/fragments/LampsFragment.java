@@ -1,7 +1,6 @@
 package ru.mera.smamonov.retrofittest.fragments;
 
-import android.content.Context;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -21,20 +22,11 @@ import ru.mera.smamonov.retrofittest.context.AppContext;
 import ru.mera.smamonov.retrofittest.controller.IotManager;
 import ru.mera.smamonov.retrofittest.model.Lamp;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link LampsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link LampsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class LampsFragment extends Fragment {
 
     private static final String LOG_TAG = "LampsFragment";
 
     private RecyclerView m_lamps_view = null;
-    private OnFragmentInteractionListener m_listener = null;
 
     public LampsFragment() {
         // Required empty public constructor
@@ -82,37 +74,28 @@ public class LampsFragment extends Fragment {
 
             @Override
             public void OnFailure(Throwable t) {
-                Log.e(LOG_TAG, t.getMessage());
+                Log.e(LOG_TAG, "Unable to get lamps list, reason:" + t.getMessage());
+
+                Toast toast = Toast.makeText(getActivity(),
+                        "Unable to get lamps list, reason:" + t.getMessage(),
+                        Toast.LENGTH_SHORT);
+                TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                text_view.setTextColor(Color.RED);
+                toast.show();
             }
 
             @Override
             public void OnFailure(String error) {
-                Log.e(LOG_TAG, error);
+                Log.e(LOG_TAG, "Unable to get lamps list, reason:" + error);
+
+                Toast toast = Toast.makeText(getActivity(),
+                        "Unable to get lamps list, reason:" + error,
+                        Toast.LENGTH_SHORT);
+                TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                text_view.setTextColor(Color.RED);
+                toast.show();
             }
         });
         return rootView;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        if (context instanceof OnFragmentInteractionListener) {
-            m_listener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        m_listener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }

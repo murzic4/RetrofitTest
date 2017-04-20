@@ -50,14 +50,6 @@ public interface IotInterface {
 
     @DELETE("scenes/{scene_id}")
     Call<ApiResponse> deleteScene(@Path("scene_id") String device_id);
-/*
-    Retrofit retrofit = new Retrofit.Builder()
-            //.baseUrl("http://192.168.56.1:8080/")
-            .baseUrl(AppContext.getAppContext().getSharedPreferences(AppContext.getAppContext().getResources().getString(R.string.settings_file_name),
-                    MODE_PRIVATE).getString("url", "http://192.168.56.1:8080/"))
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
-            */
 }
 
 

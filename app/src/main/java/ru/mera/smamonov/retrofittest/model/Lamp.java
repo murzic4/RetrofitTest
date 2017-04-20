@@ -23,6 +23,22 @@ public class Lamp extends GenericDevice {
     transient static int index = 0;
     transient static List<Lamp> m_list = new LinkedList();
 
+    @Override
+    public boolean equals(Object obj) {
+        boolean result = false;
+
+        if (obj instanceof Lamp) {
+            Lamp lamp = (Lamp) obj;
+
+            if (lamp != null &&
+                    lamp.getUuid().equals(getUuid())) {
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
     public static Lamp generate() {
         Lamp result = new Lamp();
 

@@ -1,14 +1,11 @@
 package ru.mera.smamonov.retrofittest.activities;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.MenuItem;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,9 +15,7 @@ import ru.mera.smamonov.retrofittest.fragments.ConfigurationFragment;
 import ru.mera.smamonov.retrofittest.fragments.LampsFragment;
 import ru.mera.smamonov.retrofittest.fragments.ScenesFragment;
 
-public class MainActivity extends AppCompatActivity
-        implements LampsFragment.OnFragmentInteractionListener,
-        ScenesFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "MainActivity";
 
@@ -78,6 +73,7 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
     */
+    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -92,7 +88,7 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-
+*/
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -127,8 +123,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /*
     @Override
     public void onFragmentInteraction(Uri uri) {
         Log.e(LOG_TAG, uri.toString());
-    }
+    }*/
 }

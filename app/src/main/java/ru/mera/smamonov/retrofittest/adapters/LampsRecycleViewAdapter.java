@@ -1,6 +1,7 @@
 package ru.mera.smamonov.retrofittest.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,7 +23,6 @@ import ru.mera.smamonov.retrofittest.model.Lamp;
 public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public interface SetLampListener
-
     {
         void onLampSet(final Lamp lamp);
     }
@@ -38,6 +38,29 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         saveLamp(lamp);
     }
 
+    /*
+    void getAndUpdateLampsList() {
+        AppContext.getIotManager().getLamps(new IotManager.GetListListener<Lamp>() {
+            @Override
+            public void OnSuccess(List<Lamp> devices) {
+                Log.e(LOG_TAG, "Obtaining list of scenes");
+                m_lamps.clear();
+                m_lamps.addAll(devices);
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public void OnFailure(Throwable t) {
+                Log.e(LOG_TAG, "Unable to obtain list of scenes, reason:" + t.getMessage());
+            }
+
+            @Override
+            public void OnFailure(String error) {
+                Log.e(LOG_TAG, "Unable to obtain list of scenes, reason:" + error);
+            }
+        });
+    }
+*/
     void saveLamp(final Lamp lamp) {
 
         Log.d(LOG_TAG, "Saving lamp " + lamp.getUuid() + " ...");
@@ -51,14 +74,26 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                     @Override
                     public void OnSuccess(Lamp device) {
                         Log.e(LOG_TAG, "Lamp saved " + lamp.getUuid());
+
+                        Toast.makeText(m_parent_context,
+                                "Lamp saved " + lamp.getUuid(),
+                                Toast.LENGTH_SHORT).show();
+
                         updateLampList();
                     }
 
                     @Override
                     public void OnFailure(Throwable t) {
                         Log.e(LOG_TAG,
-                                "Unable to set: " + lamp.getUuid() + " reason:" + t.getMessage());
-                        //TODO: remove this:
+                                "Unable to set lamp: " + lamp.getUuid() + " reason:" + t.getMessage());
+
+                        Toast toast = Toast.makeText(m_parent_context,
+                                "Unable to set lamp: " + lamp.getUuid() + " reason:" + t.getMessage(),
+                                Toast.LENGTH_SHORT);
+                        TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                        text_view.setTextColor(Color.RED);
+                        toast.show();
+
                         updateLampList();
                     }
 
@@ -66,6 +101,14 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                     public void OnFailure(String error) {
                         Log.e(LOG_TAG,
                                 "Unable to set: " + lamp.getUuid() + " reason:" + error);
+
+                        Toast toast = Toast.makeText(m_parent_context,
+                                "Unable to set lamp: " + lamp.getUuid() + " reason:" + error,
+                                Toast.LENGTH_SHORT);
+                        TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                        text_view.setTextColor(Color.RED);
+                        toast.show();
+
                         //TODO: remove this:
                         updateLampList();
                     }
