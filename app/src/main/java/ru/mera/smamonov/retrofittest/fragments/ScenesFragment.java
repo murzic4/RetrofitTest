@@ -22,7 +22,7 @@ import ru.mera.smamonov.retrofittest.model.Scene;
 
 public class ScenesFragment extends Fragment {
 
-    private static final String LOG_TAG = "ScenesActivity";
+    private static final String LOG_TAG = "ScenesFragment";
 
     RecyclerView m_recycler_view = null;
 

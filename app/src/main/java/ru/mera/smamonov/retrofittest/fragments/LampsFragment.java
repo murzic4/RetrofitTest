@@ -1,5 +1,6 @@
 package ru.mera.smamonov.retrofittest.fragments;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -43,8 +44,6 @@ public class LampsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
     }
 
     @Override
@@ -76,24 +75,30 @@ public class LampsFragment extends Fragment {
             public void OnFailure(Throwable t) {
                 Log.e(LOG_TAG, "Unable to get lamps list, reason:" + t.getMessage());
 
-                Toast toast = Toast.makeText(getActivity(),
-                        "Unable to get lamps list, reason:" + t.getMessage(),
-                        Toast.LENGTH_SHORT);
-                TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
-                text_view.setTextColor(Color.RED);
-                toast.show();
+                final Context context = getActivity();
+                if (context != null) {
+                    Toast toast = Toast.makeText(getActivity(),
+                            "Unable to get lamps list, reason:" + t.getMessage(),
+                            Toast.LENGTH_SHORT);
+                    TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                    text_view.setTextColor(Color.RED);
+                    toast.show();
+                }
             }
 
             @Override
             public void OnFailure(String error) {
                 Log.e(LOG_TAG, "Unable to get lamps list, reason:" + error);
 
-                Toast toast = Toast.makeText(getActivity(),
-                        "Unable to get lamps list, reason:" + error,
-                        Toast.LENGTH_SHORT);
-                TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
-                text_view.setTextColor(Color.RED);
-                toast.show();
+                final Context context = getActivity();
+                if (context != null) {
+                    Toast toast = Toast.makeText(getActivity(),
+                            "Unable to get lamps list, reason:" + error,
+                            Toast.LENGTH_SHORT);
+                    TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                    text_view.setTextColor(Color.RED);
+                    toast.show();
+                }
             }
         });
         return rootView;
