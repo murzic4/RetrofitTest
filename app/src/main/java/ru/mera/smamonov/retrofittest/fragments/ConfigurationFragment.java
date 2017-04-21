@@ -2,7 +2,6 @@ package ru.mera.smamonov.retrofittest.fragments;
 
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,6 +28,10 @@ import static android.content.Context.MODE_PRIVATE;
 public class ConfigurationFragment extends GenericFragment {
 
     static final String LOG_TAG = "ConfigurationFragment";
+    EditText m_url_text = null;
+    String m_old_url = null;
+
+
     public ConfigurationFragment() {
         // Required empty public constructor
     }
@@ -48,7 +51,7 @@ public class ConfigurationFragment extends GenericFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View rootView = inflater.inflate(R.layout.configuration_fragment, container, false);
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -57,41 +60,42 @@ public class ConfigurationFragment extends GenericFragment {
         final SharedPreferences settings = getActivity().getSharedPreferences(getResources().getString(R.string.settings_file_name),
                 MODE_PRIVATE);
 
-        final EditText url_text = (EditText) rootView.findViewById(R.id.url_text);
-        String default_url = AppContext.getAppContext().getString(R.string.default_url);
-        url_text.setText(settings.getString("url", default_url));
+        m_url_text = (EditText) rootView.findViewById(R.id.url_text);
+
+        updateView();
 
         Button button = (Button) rootView.findViewById(R.id.apply_configuration_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage(R.string.title_update_configuration)
-                        .setPositiveButton(R.string.restart,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        String url = url_text.getText().toString();
-                                        SharedPreferences.Editor editor = settings.edit();
-                                        editor.putString("url", url);
-                                        editor.commit();
+                final String url = m_url_text.getText().toString();
 
-                                        AppContext.getIotManager().configureRetrofit(url);
+                if (!m_old_url.equals(url)) {
 
-                                        Intent intent = getActivity().getIntent();
-                                        getActivity().finish();
-                                        startActivity(intent);
-                                    }
-                                })
-                        .setNegativeButton(R.string.restart_cancel,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage(R.string.title_update_configuration)
+                            .setPositiveButton(R.string.restart,
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            SharedPreferences.Editor editor = settings.edit();
+                                            editor.putString("url", url);
+                                            editor.apply();
 
-                                    }
-                                });
+                                            AppContext.getIotManager().configureRetrofit(url);
+                                            m_old_url = url;
+                                        }
+                                    })
+                            .setNegativeButton(R.string.restart_cancel,
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
 
-                AlertDialog alert = builder.create();
-                alert.show();
+                                        }
+                                    });
+
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
             }
         });
 
@@ -101,5 +105,11 @@ public class ConfigurationFragment extends GenericFragment {
     @Override
     public void updateView() {
         Log.e(LOG_TAG, "updateView");
+
+        final SharedPreferences settings = getActivity().getSharedPreferences(getResources().getString(R.string.settings_file_name),
+                MODE_PRIVATE);
+
+        m_old_url = settings.getString("url", AppContext.getAppContext().getString(R.string.default_url));
+        m_url_text.setText(m_old_url);
     }
 }

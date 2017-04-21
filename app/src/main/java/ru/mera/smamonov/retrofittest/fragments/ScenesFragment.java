@@ -30,6 +30,7 @@ public class ScenesFragment extends GenericFragment {
 
     RecyclerView m_recycler_view = null;
     FloatingActionButton m_fab = null;
+    boolean m_list_was_requested = false;
 
     public ScenesFragment() {
         // Required empty public constructor
@@ -53,53 +54,55 @@ public class ScenesFragment extends GenericFragment {
     public void updateView() {
 
         Log.e(LOG_TAG, "updateView");
+        if (!m_list_was_requested) {
+            m_list_was_requested = true;
+            AppContext.getIotManager().getScenes(new IotManager.GetListListener<Scene>() {
+                @Override
+                public void OnSuccess(List<Scene> devices) {
+                    ScenesRecycleViewAdapter adapter = new ScenesRecycleViewAdapter(devices, getContext());
+                    m_recycler_view.setAdapter(adapter);
 
-        AppContext.getIotManager().getScenes(new IotManager.GetListListener<Scene>() {
-            @Override
-            public void OnSuccess(List<Scene> devices) {
-                ScenesRecycleViewAdapter adapter = new ScenesRecycleViewAdapter(devices, getContext());
-                m_recycler_view.setAdapter(adapter);
-
-                m_fab.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void OnFailure(Throwable t) {
-                Log.e(LOG_TAG, t.getMessage());
-
-                final Context context = getActivity();
-                if (context != null) {
-                    Toast toast = Toast.makeText(getActivity(),
-                            "Unable to get scenes list, reason:" + t.getMessage(),
-                            Toast.LENGTH_SHORT);
-                    TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
-                    text_view.setTextColor(Color.RED);
-                    toast.show();
+                    m_fab.setVisibility(View.VISIBLE);
+                    m_list_was_requested = false;
                 }
 
-                m_fab.setVisibility(View.INVISIBLE);
-            }
+                @Override
+                public void OnFailure(Throwable t) {
+                    Log.e(LOG_TAG, t.getMessage());
 
-            @Override
-            public void OnFailure(String error) {
-                Log.e(LOG_TAG, error);
+                    final Context context = getActivity();
+                    if (context != null) {
+                        Toast toast = Toast.makeText(getActivity(),
+                                "Unable to get scenes list, reason:" + t.getMessage(),
+                                Toast.LENGTH_SHORT);
+                        TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                        text_view.setTextColor(Color.RED);
+                        toast.show();
+                    }
 
-                final Context context = getActivity();
-                if (context != null) {
-                    Toast toast = Toast.makeText(getActivity(),
-                            "Unable to get scenes list, reason:" + error,
-                            Toast.LENGTH_SHORT);
-                    TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
-                    text_view.setTextColor(Color.RED);
-                    toast.show();
+                    m_fab.setVisibility(View.INVISIBLE);
+                    m_list_was_requested = false;
                 }
 
-                m_fab.setVisibility(View.INVISIBLE);
-            }
+                @Override
+                public void OnFailure(String error) {
+                    Log.e(LOG_TAG, error);
 
+                    final Context context = getActivity();
+                    if (context != null) {
+                        Toast toast = Toast.makeText(getActivity(),
+                                "Unable to get scenes list, reason:" + error,
+                                Toast.LENGTH_SHORT);
+                        TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                        text_view.setTextColor(Color.RED);
+                        toast.show();
+                    }
 
-        });
-
+                    m_fab.setVisibility(View.INVISIBLE);
+                    m_list_was_requested = false;
+                }
+            });
+        }
     }
 
     @Override

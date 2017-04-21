@@ -19,8 +19,8 @@
     <string name="title_configuration">Configuration</string>
     <string name="apply_configuration_button">Save configuration</string>
     <string name="settings_file_name">settings</string>
-    <string name="title_update_configuration">Restart needed for apply configuration</string>
-    <string name="restart">Restart</string>
+    <string name="title_update_configuration">Are you sure you would like to update url?</string>
+    <string name="restart">Update</string>
     <string name="restart_cancel">Cancel</string>
     <string name="default_url">"http://192.168.56.1:8080/"</string>
 </resources>

@@ -25,7 +25,7 @@ import ru.mera.smamonov.retrofittest.model.Lamp;
 public class LampsFragment extends GenericFragment {
 
     private static final String LOG_TAG = "LampsFragment";
-
+    boolean m_list_was_requested = false;
     private RecyclerView m_lamps_view = null;
 
     public LampsFragment() {
@@ -50,48 +50,54 @@ public class LampsFragment extends GenericFragment {
     @Override
     public void updateView() {
         Log.e(LOG_TAG, "updateView");
+        if (!m_list_was_requested) {
+            m_list_was_requested = true;
+            AppContext.getIotManager().getLamps(new IotManager.GetListListener<Lamp>() {
 
-        AppContext.getIotManager().getLamps(new IotManager.GetListListener<Lamp>() {
+                @Override
+                public void OnSuccess(List<Lamp> lamps) {
+                    LampsRecycleViewAdapter adapter = new LampsRecycleViewAdapter(lamps,
+                            getContext(),
+                            null);
+                    m_lamps_view.setAdapter(adapter);
 
-            @Override
-            public void OnSuccess(List<Lamp> lamps) {
-                LampsRecycleViewAdapter adapter = new LampsRecycleViewAdapter(lamps,
-                        getContext(),
-                        null);
-                m_lamps_view.setAdapter(adapter);
-            }
-
-            @Override
-            public void OnFailure(Throwable t) {
-                Log.e(LOG_TAG, "Unable to get lamps list, reason:" + t.getMessage());
-
-                final Context context = getActivity();
-                if (context != null) {
-                    Toast toast = Toast.makeText(getActivity(),
-                            "Unable to get lamps list, reason:" + t.getMessage(),
-                            Toast.LENGTH_SHORT);
-                    TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
-                    text_view.setTextColor(Color.RED);
-                    toast.show();
+                    m_list_was_requested = false;
                 }
-            }
 
-            @Override
-            public void OnFailure(String error) {
-                Log.e(LOG_TAG, "Unable to get lamps list, reason:" + error);
+                @Override
+                public void OnFailure(Throwable t) {
+                    Log.e(LOG_TAG, "Unable to get lamps list, reason:" + t.getMessage());
 
-                final Context context = getActivity();
-                if (context != null) {
-                    Toast toast = Toast.makeText(getActivity(),
-                            "Unable to get lamps list, reason:" + error,
-                            Toast.LENGTH_SHORT);
-                    TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
-                    text_view.setTextColor(Color.RED);
-                    toast.show();
+                    final Context context = getActivity();
+                    if (context != null) {
+                        Toast toast = Toast.makeText(getActivity(),
+                                "Unable to get lamps list, reason:" + t.getMessage(),
+                                Toast.LENGTH_SHORT);
+                        TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                        text_view.setTextColor(Color.RED);
+                        toast.show();
+                    }
+
+                    m_list_was_requested = false;
                 }
-            }
-        });
 
+                @Override
+                public void OnFailure(String error) {
+                    Log.e(LOG_TAG, "Unable to get lamps list, reason:" + error);
+
+                    final Context context = getActivity();
+                    if (context != null) {
+                        Toast toast = Toast.makeText(getActivity(),
+                                "Unable to get lamps list, reason:" + error,
+                                Toast.LENGTH_SHORT);
+                        TextView text_view = (TextView) toast.getView().findViewById(android.R.id.message);
+                        text_view.setTextColor(Color.RED);
+                        toast.show();
+                    }
+                    m_list_was_requested = false;
+                }
+            });
+        }
     }
 
     @Override
