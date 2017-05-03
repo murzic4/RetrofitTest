@@ -39,6 +39,14 @@
                 android:layout_below="@+id/lamp_name"
                 android:layout_toRightOf="@+id/lamp_picture"
                 android:textSize="13sp" />
+
+            <SeekBar
+                android:id="@+id/lamp_dimming"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/lamp_uuid"
+                android:max="255"
+                android:textSize="13sp" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>

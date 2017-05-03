@@ -8,9 +8,32 @@ import java.util.List;
 import java.util.UUID;
 
 public class Lamp extends GenericDevice {
+    transient static int index = 0;
+    transient static List<Lamp> m_list = new LinkedList();
     @SerializedName("switched")
     @Expose
     private Boolean switched;
+    @SerializedName("dimming")
+    @Expose
+    private Integer dimming;
+
+    public static Lamp generate() {
+        Lamp result = new Lamp();
+
+        result.setName("Lamp#" + Integer.toString(index));
+        result.setUuid(UUID.randomUUID().toString());
+        result.setSwitched(index % 2 == 0 ?
+                Boolean.valueOf(true) :
+                Boolean.valueOf(false));
+
+        index++;
+        m_list.add(result);
+        return result;
+    }
+
+    public static List<Lamp> getList() {
+        return m_list;
+    }
 
     public Boolean getSwitched() {
         return switched;
@@ -20,8 +43,13 @@ public class Lamp extends GenericDevice {
         this.switched = switched;
     }
 
-    transient static int index = 0;
-    transient static List<Lamp> m_list = new LinkedList();
+    public Integer getDimming() {
+        return dimming;
+    }
+
+    public void setDimming(Integer dimming) {
+        this.dimming = dimming;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -37,23 +65,5 @@ public class Lamp extends GenericDevice {
         }
 
         return result;
-    }
-
-    public static Lamp generate() {
-        Lamp result = new Lamp();
-
-        result.setName("Lamp#" + Integer.toString(index));
-        result.setUuid(UUID.randomUUID().toString());
-        result.setSwitched(index % 2 == 0 ?
-                new Boolean(true) :
-                new Boolean(false));
-
-        index++;
-        m_list.add(result);
-        return result;
-    }
-
-    public static List<Lamp> getList() {
-        return m_list;
     }
 }

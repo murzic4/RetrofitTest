@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,12 +23,20 @@ import ru.mera.smamonov.retrofittest.model.Lamp;
 
 public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    public interface SetLampListener
-    {
-        void onLampSet(final Lamp lamp);
-    }
-
     static private String LOG_TAG = "LampsAdapter";
+    private List<Lamp> m_lamps = null;
+    //private AppCompatActivity m_parent_activity = null;
+    private Context m_parent_context = null;
+    private SetLampListener m_lamp_set_listener = null;
+
+    public LampsRecycleViewAdapter(List<Lamp> lamps,
+                                   /*final AppCompatActivity parent_activity,*/
+                                   final Context context,
+                                   final SetLampListener set_lamp_listener) {
+        this.m_lamps = lamps;
+        this.m_parent_context = context;
+        this.m_lamp_set_listener = set_lamp_listener;
+    }
 
     void updateLampList() {
         notifyDataSetChanged();
@@ -115,57 +124,6 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                 });
     }
 
-    private List<Lamp> m_lamps = null;
-    //private AppCompatActivity m_parent_activity = null;
-    private Context m_parent_context = null;
-    private SetLampListener m_lamp_set_listener = null;
-
-    public class LampViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
-        CardView m_card_view = null;
-        TextView m_lamp_name = null;
-        TextView m_lamp_uuid = null;
-        ImageView m_lamp_picture = null;
-        Lamp m_lamp = null;
-
-        LampViewHolder(View itemView) {
-            super(itemView);
-            m_card_view = (CardView) itemView.findViewById(R.id.lamp_card_view);
-            m_lamp_name = (TextView) itemView.findViewById(R.id.lamp_name);
-            m_lamp_uuid = (TextView) itemView.findViewById(R.id.lamp_uuid);
-            m_lamp_picture = (ImageView) itemView.findViewById(R.id.lamp_picture);
-        }
-
-        void RevertLamp() {
-            m_lamp.setSwitched(!m_lamp.getSwitched());
-            setActualPicture();
-        }
-
-        void setActualPicture() {
-            if (m_lamp.getSwitched()) {
-                m_lamp_picture.setImageResource(R.drawable.ic_lamp_on);
-            } else {
-                m_lamp_picture.setImageResource(R.drawable.ic_lamp_off);
-            }
-        }
-
-        void setActualView() {
-            m_lamp_name.setText(m_lamp.getName());
-            m_lamp_uuid.setText(m_lamp.getUuid());
-            setActualPicture();
-        }
-    }
-
-    public LampsRecycleViewAdapter(List<Lamp> lamps,
-                                   /*final AppCompatActivity parent_activity,*/
-                                   final Context context,
-                                   final SetLampListener set_lamp_listener) {
-        this.m_lamps = lamps;
-        //this.m_parent_activity = parent_activity;
-        this.m_parent_context = context;
-        this.m_lamp_set_listener = set_lamp_listener;
-    }
-
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder,
                                  int position) {
@@ -188,6 +146,36 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                         } else {
                             Log.d(LOG_TAG,
                                     "Executing custom click listener for Lamp:" + lamp.getUuid());
+                            lamp.setSwitched(!lamp.getSwitched());
+                            m_lamp_set_listener.onLampSet(lamp);
+                        }
+                    }
+                });
+
+        lampViewHolder.
+                m_lamp_dimming.
+                setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        if (m_lamp_set_listener == null) {
+                            Log.d(LOG_TAG,
+                                    "Executing default dimming change listener for Lamp:" + lamp.getUuid());
+                            lamp.setDimming(seekBar.getProgress());
+                            saveLamp(lampViewHolder.m_lamp);
+                        } else {
+                            Log.d(LOG_TAG,
+                                    "Executing custom dimming change listener for Lamp:" + lamp.getUuid());
+                            lamp.setDimming(seekBar.getProgress());
                             m_lamp_set_listener.onLampSet(lamp);
                         }
                     }
@@ -205,5 +193,49 @@ public class LampsRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public int getItemCount() {
         return this.m_lamps.size();
+    }
+
+    public interface SetLampListener {
+        void onLampSet(final Lamp lamp);
+    }
+
+    public class LampViewHolder extends RecyclerView.ViewHolder {
+        // each data item is just a string in this case
+        CardView m_card_view = null;
+        TextView m_lamp_name = null;
+        TextView m_lamp_uuid = null;
+        ImageView m_lamp_picture = null;
+        SeekBar m_lamp_dimming = null;
+        Lamp m_lamp = null;
+
+        LampViewHolder(View itemView) {
+            super(itemView);
+            m_card_view = (CardView) itemView.findViewById(R.id.lamp_card_view);
+            m_lamp_name = (TextView) itemView.findViewById(R.id.lamp_name);
+            m_lamp_uuid = (TextView) itemView.findViewById(R.id.lamp_uuid);
+            m_lamp_picture = (ImageView) itemView.findViewById(R.id.lamp_picture);
+            m_lamp_dimming = (SeekBar) itemView.findViewById(R.id.lamp_dimming);
+        }
+
+        void RevertLamp() {
+            m_lamp.setSwitched(!m_lamp.getSwitched());
+            setActualPicture();
+        }
+
+        void setActualPicture() {
+            if (m_lamp.getSwitched()) {
+                m_lamp_picture.setImageResource(R.drawable.ic_lamp_on);
+            } else {
+                m_lamp_picture.setImageResource(R.drawable.ic_lamp_off);
+            }
+        }
+
+        void setActualView() {
+            m_lamp_name.setText(m_lamp.getName());
+            m_lamp_uuid.setText(m_lamp.getUuid());
+            m_lamp_dimming.setProgress(m_lamp.getDimming());
+            Log.e(LOG_TAG, "setActualView: " + m_lamp.getName() + " dimming:" + m_lamp.getDimming());
+            setActualPicture();
+        }
     }
 }

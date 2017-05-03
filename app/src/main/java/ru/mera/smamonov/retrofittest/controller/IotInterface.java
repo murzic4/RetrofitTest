@@ -9,7 +9,6 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 import ru.mera.smamonov.retrofittest.model.ApiResponse;
 import ru.mera.smamonov.retrofittest.model.Lamp;
 import ru.mera.smamonov.retrofittest.model.Scene;
@@ -30,7 +29,7 @@ public interface IotInterface {
 
     @PUT("lamps/{device_id}/")
     Call<ApiResponse> setLamp(@Path("device_id") String device_id,
-                              @Query("switched") Boolean swithced);
+                              @Body Lamp lamp);
 
     /*************************************************************************************
      * Scenes

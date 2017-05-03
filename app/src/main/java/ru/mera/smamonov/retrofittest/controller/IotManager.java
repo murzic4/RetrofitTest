@@ -23,35 +23,9 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class IotManager {
 
-    public interface FailureListener {
-        void OnFailure(Throwable t);
-
-        void OnFailure(String error);
-    }
-
-    public interface GetListListener<DeviceType> extends FailureListener {
-        void OnSuccess(final List<DeviceType> devices);
-    }
-
-    public interface SetListener<DeviceType> extends FailureListener {
-        void OnSuccess(DeviceType device);
-    }
-
-    public interface GetListener<DeviceType> extends FailureListener {
-        void OnSuccess(DeviceType device);
-    }
-
-    public interface CreateListener<DeviceType> extends FailureListener {
-        void OnSuccess(DeviceType device);
-    }
-
-    public interface DeleteListener<DeviceType> extends FailureListener {
-        void OnSuccess(DeviceType device);
-    }
-
-    private IotInterface m_interface = null;
-    private final String LOG_TAG = "IotManager";
     private static Retrofit m_retrofit = null;
+    private final String LOG_TAG = "IotManager";
+    private IotInterface m_interface = null;
 
     public IotManager() {
         String url = AppContext.getAppContext().getSharedPreferences(AppContext.getAppContext().getResources().getString(R.string.settings_file_name),
@@ -143,7 +117,7 @@ public class IotManager {
     public void setLamp(final Lamp lamp,
                         final SetListener<Lamp> updateListener) {
 
-        Call<ApiResponse> response = m_interface.setLamp(lamp.getUuid(), lamp.getSwitched());
+        Call<ApiResponse> response = m_interface.setLamp(lamp.getUuid(), lamp);
 
         response.enqueue(new Callback<ApiResponse>() {
             final SetListener<Lamp> listener = updateListener;
@@ -359,6 +333,32 @@ public class IotManager {
                 }
             }
         });
+    }
+
+    public interface FailureListener {
+        void OnFailure(Throwable t);
+
+        void OnFailure(String error);
+    }
+
+    public interface GetListListener<DeviceType> extends FailureListener {
+        void OnSuccess(final List<DeviceType> devices);
+    }
+
+    public interface SetListener<DeviceType> extends FailureListener {
+        void OnSuccess(DeviceType device);
+    }
+
+    public interface GetListener<DeviceType> extends FailureListener {
+        void OnSuccess(DeviceType device);
+    }
+
+    public interface CreateListener<DeviceType> extends FailureListener {
+        void OnSuccess(DeviceType device);
+    }
+
+    public interface DeleteListener<DeviceType> extends FailureListener {
+        void OnSuccess(DeviceType device);
     }
 
 

@@ -42,8 +42,10 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private List<Scene> m_scenes = null;
     private Context m_parent_context = null;
 
-    private interface ModifyDeviceListListener {
-        void onModify();
+    public ScenesRecycleViewAdapter(List<Scene> scenes,
+                                    final Context parent_context) {
+        this.m_scenes = scenes;
+        this.m_parent_context = parent_context;
     }
 
     void updateSceneList() {
@@ -93,7 +95,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 new LampsRecycleViewAdapter.SetLampListener() {
                     @Override
                     public void onLampSet(Lamp lamp) {
-                        lamp.setSwitched(!lamp.getSwitched());
+                        //lamp.setSwitched(!lamp.getSwitched());
                         scene_view_holder.setActualView();
                     }
                 });
@@ -401,83 +403,6 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 });
     }
 
-    public class SceneViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
-        CardView m_card_view = null;
-        TextView m_scene_name = null;
-        TextView m_scene_uuid = null;
-        RecyclerView m_recycler_view = null;
-        Switch m_switch = null;
-        ImageButton m_menu_image = null;
-
-        Scene m_scene = null;
-
-        SceneViewHolder(View itemView) {
-            super(itemView);
-            m_card_view = (CardView) itemView.findViewById(R.id.scene_card_view);
-            m_scene_name = (TextView) itemView.findViewById(R.id.scene_name);
-            m_scene_uuid = (TextView) itemView.findViewById(R.id.scene_uuid);
-            m_recycler_view = (RecyclerView) itemView.findViewById(R.id.recycle_view_devices);
-            m_switch = (Switch) itemView.findViewById(R.id.scene_activated_switch);
-            m_menu_image = (ImageButton) itemView.findViewById(R.id.scene_popup_menu);
-        }
-
-        void showRenameDialog() {
-            final EditText input = new EditText(m_parent_context);
-            input.setText(m_scene.getName());
-
-            LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT);
-            input.setLayoutParams(layout);
-            AlertDialog.Builder dialog_builder = new AlertDialog.Builder(m_parent_context);
-            dialog_builder.setView(input)
-                    .setTitle(R.string.rename_scene_caption)
-                    .setPositiveButton(R.string.rename_scene_ok,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int id) {
-                                    m_scene.setName(input.getText().toString());
-                                    setActualView();
-                                }
-                            })
-                    .setNegativeButton(R.string.rename_scene_cancel,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-
-                                }
-                            });
-            dialog_builder.create();
-            dialog_builder.show();
-        }
-
-        void setActualView() {
-            m_scene_name.setText(m_scene.getName());
-            m_scene_uuid.setText(m_scene.getUuid());
-            m_switch.setChecked(m_scene.getActivated());
-
-            final RecyclerView.Adapter adapter = m_recycler_view.getAdapter();
-
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
-            }
-
-            m_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    Log.d(LOG_TAG, "Set scene:" + m_scene.getUuid() + " activated:" + isChecked);
-                    m_scene.setActivated(isChecked);
-                }
-            });
-        }
-    }
-
-    public ScenesRecycleViewAdapter(List<Scene> scenes,
-                                    final Context parent_context) {
-        this.m_scenes = scenes;
-        this.m_parent_context = parent_context;
-    }
-
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         final SceneViewHolder sceneViewHolder = (SceneViewHolder) viewHolder;
@@ -491,7 +416,7 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 new LampsRecycleViewAdapter.SetLampListener() {
                     @Override
                     public void onLampSet(Lamp lamp) {
-                        lamp.setSwitched(!lamp.getSwitched());
+                        //lamp.setSwitched(!lamp.getSwitched());
                         updateSceneList();
                     }
                 });
@@ -613,6 +538,81 @@ public class ScenesRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
     @Override
     public int getItemCount() {
         return this.m_scenes.size();
+    }
+
+    private interface ModifyDeviceListListener {
+        void onModify();
+    }
+
+    public class SceneViewHolder extends RecyclerView.ViewHolder {
+        // each data item is just a string in this case
+        CardView m_card_view = null;
+        TextView m_scene_name = null;
+        TextView m_scene_uuid = null;
+        RecyclerView m_recycler_view = null;
+        Switch m_switch = null;
+        ImageButton m_menu_image = null;
+
+        Scene m_scene = null;
+
+        SceneViewHolder(View itemView) {
+            super(itemView);
+            m_card_view = (CardView) itemView.findViewById(R.id.scene_card_view);
+            m_scene_name = (TextView) itemView.findViewById(R.id.scene_name);
+            m_scene_uuid = (TextView) itemView.findViewById(R.id.scene_uuid);
+            m_recycler_view = (RecyclerView) itemView.findViewById(R.id.recycle_view_devices);
+            m_switch = (Switch) itemView.findViewById(R.id.scene_activated_switch);
+            m_menu_image = (ImageButton) itemView.findViewById(R.id.scene_popup_menu);
+        }
+
+        void showRenameDialog() {
+            final EditText input = new EditText(m_parent_context);
+            input.setText(m_scene.getName());
+
+            LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+            input.setLayoutParams(layout);
+            AlertDialog.Builder dialog_builder = new AlertDialog.Builder(m_parent_context);
+            dialog_builder.setView(input)
+                    .setTitle(R.string.rename_scene_caption)
+                    .setPositiveButton(R.string.rename_scene_ok,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    m_scene.setName(input.getText().toString());
+                                    setActualView();
+                                }
+                            })
+                    .setNegativeButton(R.string.rename_scene_cancel,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+
+                                }
+                            });
+            dialog_builder.create();
+            dialog_builder.show();
+        }
+
+        void setActualView() {
+            m_scene_name.setText(m_scene.getName());
+            m_scene_uuid.setText(m_scene.getUuid());
+            m_switch.setChecked(m_scene.getActivated());
+
+            final RecyclerView.Adapter adapter = m_recycler_view.getAdapter();
+
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+
+            m_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    Log.d(LOG_TAG, "Set scene:" + m_scene.getUuid() + " activated:" + isChecked);
+                    m_scene.setActivated(isChecked);
+                }
+            });
+        }
     }
 
 }
